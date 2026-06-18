@@ -12,7 +12,7 @@ const MovieDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0); 
-    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`)
+    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos`)
       .then((res) => res.json())
       .then((data) => setMovie(data))
       .catch((err) => console.error(err));
@@ -22,6 +22,10 @@ const MovieDetails = () => {
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
     </div>
+  );
+
+  const trailer = movie.videos?.results?.find(
+    (vid) => vid.type === "Trailer" && vid.site === "YouTube"
   );
 
   return (
@@ -97,6 +101,22 @@ const MovieDetails = () => {
                 <p className="text-2xl font-mono text-blue-500">${movie.revenue?.toLocaleString() || "N/A"}</p>
               </div>
             </div>
+
+            {trailer && (
+              <div className="mt-10">
+                <h2 className="text-xl font-bold mb-6 border-l-4 border-red-500 pl-3 uppercase tracking-widest text-sm">Official Trailer</h2>
+                <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+                  <iframe
+                    className="absolute top-0 left-0 w-full h-full"
+                    src={`https://www.youtube.com/embed/${trailer.key}?autoplay=0`}
+                    title={`${movie.title} Trailer`}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
