@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Star, Clock, Calendar, DollarSign, Heart } from "lucide-react";
 import { useWatchlist } from "../context/WatchlistContext";
 
@@ -12,7 +12,7 @@ const MovieDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0); 
-    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos,credits`)
+    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar`)
       .then((res) => res.json())
       .then((data) => setMovie(data))
       .catch((err) => console.error(err));
@@ -135,6 +135,31 @@ const MovieDetails = () => {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   ></iframe>
+                </div>
+              </div>
+            )}
+
+            {movie.similar?.results && movie.similar.results.length > 0 && (
+              <div className="mt-16 mb-10">
+                <h2 className="text-2xl font-bold mb-6 border-l-4 border-yellow-500 pl-3 uppercase tracking-widest text-sm">You May Also Like</h2>
+                <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900">
+                  {movie.similar.results.slice(0, 15).map((similarMovie) => (
+                    <Link to={`/movie/${similarMovie.id}`} key={similarMovie.id} className="flex-shrink-0 w-40 group block">
+                      <div className="bg-slate-900 rounded-xl overflow-hidden shadow-lg border border-slate-800 group-hover:border-blue-500/50 transition-all duration-300 group-hover:-translate-y-2 relative">
+                        <img 
+                          src={similarMovie.poster_path ? `https://image.tmdb.org/t/p/w300${similarMovie.poster_path}` : "https://via.placeholder.com/300x450?text=No+Poster"} 
+                          alt={similarMovie.title} 
+                          className="w-full h-60 object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-yellow-400 border border-white/10">
+                          ⭐ {similarMovie.vote_average?.toFixed(1)}
+                        </div>
+                        <div className="p-3 absolute bottom-0 inset-x-0 bg-gradient-to-t from-black via-black/80 to-transparent pt-10">
+                          <p className="font-bold text-sm truncate text-white group-hover:text-blue-400 transition-colors">{similarMovie.title}</p>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </div>
             )}
