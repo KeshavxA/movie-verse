@@ -24,17 +24,21 @@ const MovieSkeleton = () => (
 const HomePage = ({ searchTerm, setSearchTerm }) => {
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const [selectedGenre, setSelectedGenre] = useState(0); 
+  const [page, setPage] = useState(1);
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedTerm(searchTerm);
-      if(searchTerm) setSelectedGenre(0);
+      if (debouncedTerm !== searchTerm) {
+        setDebouncedTerm(searchTerm);
+        setPage(1);
+        if(searchTerm) setSelectedGenre(0);
+      }
     }, 500);
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [searchTerm, debouncedTerm]);
 
-  const { movies, loading } = useMovies(debouncedTerm, selectedGenre);
+  const { movies, loading, loadingMore, hasMore } = useMovies(debouncedTerm, selectedGenre, page);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500 selection:text-white">
@@ -47,7 +51,13 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
           </h2>
 
           <div className="mt-8">
-            <GenreBar selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} />
+            <GenreBar 
+              selectedGenre={selectedGenre} 
+              setSelectedGenre={(id) => {
+                setSelectedGenre(id);
+                setPage(1);
+              }} 
+            />
           </div>
         </header>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
@@ -115,6 +125,19 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
             </div>
           )}
         </div>
+        
+        {movies.length > 0 && hasMore && (
+          <div className="mt-12 flex justify-center">
+            <button
+              onClick={() => setPage((p) => p + 1)}
+              disabled={loadingMore}
+              className="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-full transition-all disabled:opacity-50 flex items-center gap-2 border border-slate-700"
+            >
+              {loadingMore && <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+              {loadingMore ? "Loading..." : "Load More"}
+            </button>
+          </div>
+        )}
       </main>
 
       <footer className="py-10 text-center border-t border-slate-900 mt-20">

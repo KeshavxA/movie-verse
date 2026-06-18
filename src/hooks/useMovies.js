@@ -8,24 +8,30 @@ const BASE_URL = "https://api.themoviedb.org/3";
   @param {number} genreId 
  */
  
-export const useMovies = (query = "", genreId = 0) => {
+export const useMovies = (query = "", genreId = 0, page = 1) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchMovies = async () => {
-      setLoading(true);
+      if (page === 1) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
       setError(null);
       
       let endpoint = "";
 
       if (query) {
-        endpoint = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
+        endpoint = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
       } else if (genreId !== 0) {
-        endpoint = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc`;
+        endpoint = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc&page=${page}`;
       } else {
-        endpoint = `${BASE_URL}/trending/movie/day?api_key=${API_KEY}`;
+        endpoint = `${BASE_URL}/trending/movie/day?api_key=${API_KEY}&page=${page}`;
       }
 
       try {
@@ -36,17 +42,31 @@ export const useMovies = (query = "", genreId = 0) => {
         }
 
         const data = await res.json();
-        setMovies(data.results || []);
+        
+        setHasMore(data.page < data.total_pages);
+        
+        if (page === 1) {
+          setMovies(data.results || []);
+        } else {
+          setMovies((prev) => {
+            const newMovies = data.results || [];
+            // filter out duplicates just in case
+            const existingIds = new Set(prev.map(m => m.id));
+            const uniqueNew = newMovies.filter(m => !existingIds.has(m.id));
+            return [...prev, ...uniqueNew];
+          });
+        }
       } catch (err) {
         console.error("Fetch error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
     };
 
     fetchMovies();
-  }, [query, genreId]); 
+  }, [query, genreId, page]); 
 
-  return { movies, loading, error };
+  return { movies, loading, loadingMore, hasMore, error };
 };
