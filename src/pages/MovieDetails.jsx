@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, Clock, Calendar, DollarSign } from "lucide-react";
+import { ArrowLeft, Star, Clock, Calendar, DollarSign, Heart } from "lucide-react";
+import { useWatchlist } from "../context/WatchlistContext";
 
 const MovieDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
+  const { isInWatchlist, toggleWatchlist } = useWatchlist();
   const API_KEY = "4fdd0d59a1f17e38b912e065674f80d8"; 
 
   useEffect(() => {
@@ -50,7 +52,19 @@ const MovieDetails = () => {
           </div>
 
           <div className="flex-1 mt-10 md:mt-20">
-            <h1 className="text-4xl md:text-6xl font-black mb-2 leading-tight">{movie.title}</h1>
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-4xl md:text-6xl font-black leading-tight">{movie.title}</h1>
+              <button
+                onClick={() => toggleWatchlist(movie)}
+                className="ml-4 p-3 bg-slate-900 hover:bg-slate-800 rounded-full transition-all border border-slate-700 flex-shrink-0"
+                title={isInWatchlist(movie.id) ? "Remove from Watchlist" : "Add to Watchlist"}
+              >
+                <Heart 
+                  size={28} 
+                  className={isInWatchlist(movie.id) ? "fill-red-500 text-red-500" : "text-slate-400"} 
+                />
+              </button>
+            </div>
             <p className="text-blue-400 text-lg font-medium mb-6">{movie.tagline || "No tagline available"}</p>
             
             <div className="flex flex-wrap gap-4 mb-8">

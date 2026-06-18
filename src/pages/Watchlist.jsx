@@ -1,40 +1,10 @@
-import { useState, useEffect } from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
-import Navbar from "./components/Navbar";
-import GenreBar from "./components/GenreBar"; 
-import { useMovies } from "./hooks/useMovies"; 
-import MovieDetails from "./pages/MovieDetails"; 
-import Watchlist from "./pages/Watchlist";
-import { useWatchlist } from "./context/WatchlistContext";
-import Watchlist from "./pages/Watchlist";
-import { useWatchlist } from "./context/WatchlistContext";
+import Navbar from "../components/Navbar";
+import { useWatchlist } from "../context/WatchlistContext";
 
-
-const MovieSkeleton = () => (
-  <div className="bg-slate-900 rounded-2xl overflow-hidden animate-pulse border border-slate-800">
-    <div className="aspect-[2/3] bg-slate-800" />
-    <div className="p-4 space-y-3">
-      <div className="h-4 bg-slate-800 rounded w-3/4" />
-      <div className="h-3 bg-slate-800 rounded w-1/2" />
-    </div>
-  </div>
-);
-
-const HomePage = ({ searchTerm, setSearchTerm }) => {
-  const [debouncedTerm, setDebouncedTerm] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState(0); 
-  const { isInWatchlist, toggleWatchlist } = useWatchlist();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedTerm(searchTerm);
-      if(searchTerm) setSelectedGenre(0);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  const { movies, loading } = useMovies(debouncedTerm, selectedGenre);
+const Watchlist = ({ searchTerm, setSearchTerm }) => {
+  const { watchlist, toggleWatchlist, isInWatchlist } = useWatchlist();
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500 selection:text-white">
@@ -42,19 +12,17 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
       
       <main className="max-w-7xl mx-auto p-6 md:p-10">
         <header className="mb-8">
-          <h2 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-white via-slate-300 to-slate-500 bg-clip-text text-transparent">
-            {searchTerm ? `Searching: ${searchTerm}` : "Explore Movies"}
+          <h2 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-white via-slate-300 to-slate-500 bg-clip-text text-transparent flex items-center gap-4">
+            <Heart size={40} className="text-red-500 fill-red-500" /> My Watchlist
           </h2>
-
-          <div className="mt-8">
-            <GenreBar selectedGenre={selectedGenre} setSelectedGenre={setSelectedGenre} />
-          </div>
+          <p className="text-slate-400 mt-4 text-lg">
+            {watchlist.length} {watchlist.length === 1 ? "movie" : "movies"} saved
+          </p>
         </header>
+
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {loading ? (
-            [...Array(10)].map((_, i) => <MovieSkeleton key={i} />)
-          ) : movies.length > 0 ? (
-            movies.map((movie) => (
+          {watchlist.length > 0 ? (
+            watchlist.map((movie) => (
               <div key={movie.id} className="relative block group">
                 <Link to={`/movie/${movie.id}`}>
                   <div className="bg-slate-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-blue-500/20 transition-all duration-500 hover:-translate-y-2 border border-slate-800 group-hover:border-blue-500/50">
@@ -94,6 +62,7 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
                     toggleWatchlist(movie);
                   }}
                   className="absolute top-3 left-3 z-10 p-2 bg-black/50 hover:bg-black/80 backdrop-blur-md rounded-full transition-all border border-white/10 opacity-0 group-hover:opacity-100"
+                  title="Remove from Watchlist"
                 >
                   <Heart 
                     size={18} 
@@ -104,14 +73,13 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
             ))
           ) : (
             <div className="col-span-full text-center py-20 bg-slate-900/50 rounded-3xl border border-dashed border-slate-800">
-              <div className="text-6xl mb-4">🎬</div>
-              <h3 className="text-xl text-slate-400 font-medium">No movies found for this category.</h3>
-              <button 
-                onClick={() => {setSearchTerm(""); setSelectedGenre(0)}}
-                className="mt-4 text-blue-500 hover:underline"
-              >
-                Clear all filters
-              </button>
+              <div className="text-6xl mb-4 text-slate-700">
+                <Heart size={64} className="mx-auto text-slate-700" />
+              </div>
+              <h3 className="text-xl text-slate-400 font-medium">Your watchlist is empty.</h3>
+              <Link to="/" className="mt-4 inline-block text-blue-500 hover:underline">
+                Explore movies to add
+              </Link>
             </div>
           )}
         </div>
@@ -126,16 +94,4 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
   );
 };
 
-function App() {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  return (
-    <Routes>
-      <Route path="/" element={<HomePage searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
-      <Route path="/movie/:id" element={<MovieDetails />} />
-      <Route path="/watchlist" element={<Watchlist searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
-    </Routes>
-  );
-}
-
-export default App;
+export default Watchlist;

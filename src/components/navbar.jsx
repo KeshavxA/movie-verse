@@ -1,10 +1,18 @@
-import { Search, Film, X } from "lucide-react";
+import { Search, Film, X, Heart } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useWatchlist } from "../context/WatchlistContext";
 
 const Navbar = ({ searchTerm, setSearchTerm }) => {
+  const { watchlist } = useWatchlist();
+  const navigate = useNavigate();
+
   return (
     <nav className="flex items-center justify-between px-4 md:px-8 py-4 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-800">
       
-      <div className="flex items-center gap-2 cursor-pointer" onClick={() => setSearchTerm("")}>
+      <div className="flex items-center gap-2 cursor-pointer" onClick={() => {
+        setSearchTerm("");
+        navigate("/");
+      }}>
         <Film className="text-blue-500" size={30} />
         <h1 className="text-xl md:text-2xl font-black text-white tracking-tighter">
         <span className="text-blue-500">MOVIEVERSE</span>
@@ -16,7 +24,12 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
           type="text"
           placeholder="Search movies..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            if(window.location.pathname !== "/") {
+              navigate("/");
+            }
+          }}
           className="w-full bg-slate-900 text-slate-200 pl-10 pr-10 py-2 rounded-full border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-slate-500"
         />
         
@@ -35,11 +48,21 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
         )}
       </div>
 
-      <div className="hidden md:flex items-center gap-4">
-        <div className="h-8 w-[1px] bg-slate-800 mx-2"></div>
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
-          <span className="text-blue-500">Watchlist</span>
-        </p>
+      <div className="flex items-center gap-4">
+        <div className="hidden md:block h-8 w-[1px] bg-slate-800 mx-2"></div>
+        <Link to="/watchlist" className="flex items-center gap-2 group hover:text-blue-400 transition-colors cursor-pointer">
+          <div className="relative">
+            <Heart size={24} className="text-slate-400 group-hover:text-red-500 transition-colors" />
+            {watchlist.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
+                {watchlist.length}
+              </span>
+            )}
+          </div>
+          <p className="hidden md:block text-xs font-semibold text-slate-300 uppercase tracking-widest group-hover:text-blue-400 transition-colors">
+            Watchlist
+          </p>
+        </Link>
       </div>
     </nav>
   );
