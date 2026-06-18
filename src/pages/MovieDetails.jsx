@@ -12,7 +12,7 @@ const MovieDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0); 
-    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos`)
+    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos,credits`)
       .then((res) => res.json())
       .then((data) => setMovie(data))
       .catch((err) => console.error(err));
@@ -90,6 +90,27 @@ const MovieDetails = () => {
               <h2 className="text-xl font-bold mb-3 border-l-4 border-blue-500 pl-3 uppercase tracking-widest text-sm">Overview</h2>
               <p className="text-slate-400 text-lg leading-relaxed">{movie.overview}</p>
             </div>
+
+            {movie.credits?.cast && movie.credits.cast.length > 0 && (
+              <div className="mb-10">
+                <h2 className="text-xl font-bold mb-6 border-l-4 border-blue-500 pl-3 uppercase tracking-widest text-sm">Top Cast</h2>
+                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900">
+                  {movie.credits.cast.slice(0, 10).map((actor) => (
+                    <div key={actor.id} className="flex-shrink-0 w-32 bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-lg">
+                      <img 
+                        src={actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : "https://via.placeholder.com/185x278?text=No+Photo"} 
+                        alt={actor.name} 
+                        className="w-full h-40 object-cover"
+                      />
+                      <div className="p-3">
+                        <p className="font-bold text-sm truncate text-white" title={actor.name}>{actor.name}</p>
+                        <p className="text-xs text-slate-400 truncate mt-1" title={actor.character}>{actor.character}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-8 py-8 border-t border-slate-900">
               <div>
