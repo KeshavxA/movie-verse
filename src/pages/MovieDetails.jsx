@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Star, Clock, Calendar, DollarSign, Heart } from "lucide-react";
+import { ArrowLeft, Star, Clock, Calendar, DollarSign, Heart, MessageSquare } from "lucide-react";
 import { useWatchlist } from "../context/WatchlistContext";
 
 const MovieDetails = () => {
@@ -12,7 +12,7 @@ const MovieDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0); 
-    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar`)
+    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar,reviews`)
       .then((res) => res.json())
       .then((data) => setMovie(data))
       .catch((err) => console.error(err));
@@ -141,7 +141,7 @@ const MovieDetails = () => {
 
             {movie.similar?.results && movie.similar.results.length > 0 && (
               <div className="mt-16 mb-10">
-                <h2 className="text-2xl font-bold mb-6 border-l-4 border-yellow-500 pl-3 uppercase tracking-widest text-sm">You May Also Like</h2>
+                <h2 className="text-2xl font-bold mb-6 border-l-4 border-yellow-500 pl-3 uppercase tracking-widest text-sm text-slate-900 dark:text-white">You May Also Like</h2>
                 <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
                   {movie.similar.results.slice(0, 15).map((similarMovie) => (
                     <Link to={`/movie/${similarMovie.id}`} key={similarMovie.id} className="flex-shrink-0 w-40 group block">
@@ -159,6 +159,47 @@ const MovieDetails = () => {
                         </div>
                       </div>
                     </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {movie.reviews?.results && movie.reviews.results.length > 0 && (
+              <div className="mt-16 mb-10">
+                <h2 className="text-2xl font-bold mb-6 border-l-4 border-green-500 pl-3 uppercase tracking-widest text-sm text-slate-900 dark:text-white">User Reviews</h2>
+                <div className="space-y-6">
+                  {movie.reviews.results.slice(0, 5).map((review) => (
+                    <div key={review.id} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="h-12 w-12 bg-blue-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 flex-shrink-0">
+                          <MessageSquare size={24} />
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-900 dark:text-white">A review by {review.author}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            {review.author_details?.rating && (
+                              <div className="flex items-center gap-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-500 px-2 py-0.5 rounded text-xs font-bold">
+                                <Star size={12} fill="currentColor" />
+                                <span>{review.author_details.rating.toFixed(1)}</span>
+                              </div>
+                            )}
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                              {new Date(review.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-slate-600 dark:text-slate-300 text-sm md:text-base leading-relaxed">
+                        {review.content.length > 400 ? (
+                          <>
+                            {review.content.slice(0, 400)}...
+                            <a href={review.url} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 ml-2 hover:underline font-medium">Read more</a>
+                          </>
+                        ) : (
+                          review.content
+                        )}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
