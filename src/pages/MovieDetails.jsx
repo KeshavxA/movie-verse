@@ -120,17 +120,19 @@ const MovieDetails = () => {
                 <h2 className="text-xl font-bold mb-6 border-l-4 border-blue-500 pl-3 uppercase tracking-widest text-sm">Top Cast</h2>
                 <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
                   {movie.credits.cast.slice(0, 10).map((actor) => (
-                    <div key={actor.id} className="flex-shrink-0 w-32 bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-lg">
-                      <img 
-                        src={actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : "https://via.placeholder.com/185x278?text=No+Photo"} 
-                        alt={actor.name} 
-                        className="w-full h-40 object-cover"
-                      />
-                      <div className="p-3">
-                        <p className="font-bold text-sm truncate text-slate-900 dark:text-white" title={actor.name}>{actor.name}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1" title={actor.character}>{actor.character}</p>
+                    <Link to={`/actor/${actor.id}`} key={actor.id} className="flex-shrink-0 w-32 group block">
+                      <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-lg group-hover:shadow-blue-500/20 group-hover:border-blue-500/50 transition-all duration-300 group-hover:-translate-y-2">
+                        <img 
+                          src={actor.profile_path ? `https://image.tmdb.org/t/p/w185${actor.profile_path}` : "https://via.placeholder.com/185x278?text=No+Photo"} 
+                          alt={actor.name} 
+                          className="w-full h-40 object-cover"
+                        />
+                        <div className="p-3">
+                          <p className="font-bold text-sm truncate text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" title={actor.name}>{actor.name}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1" title={actor.character}>{actor.character}</p>
+                        </div>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>

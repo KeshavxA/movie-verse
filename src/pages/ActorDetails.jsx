@@ -1,0 +1,135 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { ArrowLeft, MapPin, Calendar } from "lucide-react";
+
+const ActorDetails = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [actor, setActor] = useState(null);
+  const API_KEY = "4fdd0d59a1f17e38b912e065674f80d8";
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&append_to_response=movie_credits`)
+      .then((res) => res.json())
+      .then((data) => setActor(data))
+      .catch((err) => console.error(err));
+  }, [id]);
+
+  if (!actor) return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
+    </div>
+  );
+
+  // Sort movie credits by popularity to show top movies first
+  const sortedMovies = actor.movie_credits?.cast
+    ? [...actor.movie_credits.cast].sort((a, b) => b.popularity - a.popularity)
+    : [];
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white pb-20 transition-colors duration-300">
+      {/* Header/Back Button */}
+      <div className="p-6 md:p-10">
+        <button 
+          onClick={() => navigate(-1)}
+          className="p-3 bg-white dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-blue-600 rounded-full transition-all border border-slate-300 dark:border-slate-800 shadow-sm"
+        >
+          <ArrowLeft size={24} className="text-slate-900 dark:text-white" />
+        </button>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row gap-10">
+          {/* Left Sidebar: Photo & Info */}
+          <div className="flex-shrink-0 mx-auto md:mx-0 w-64 md:w-80">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800">
+              <img 
+                src={actor.profile_path ? `https://image.tmdb.org/t/p/w500${actor.profile_path}` : "https://via.placeholder.com/500x750?text=No+Photo"} 
+                className="w-full rounded-2xl object-cover mb-6"
+                alt={actor.name}
+              />
+              <h2 className="text-2xl font-black mb-4 text-center md:hidden">{actor.name}</h2>
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold border-b border-slate-200 dark:border-slate-800 pb-2">Personal Info</h3>
+                
+                <div>
+                  <p className="text-sm text-slate-500 font-bold uppercase">Known For</p>
+                  <p className="font-medium text-slate-800 dark:text-slate-200">{actor.known_for_department || "Acting"}</p>
+                </div>
+                
+                {actor.birthday && (
+                  <div>
+                    <p className="text-sm text-slate-500 font-bold uppercase flex items-center gap-1"><Calendar size={14}/> Born</p>
+                    <p className="font-medium text-slate-800 dark:text-slate-200">
+                      {new Date(actor.birthday).toLocaleDateString()}
+                      {actor.deathday && ` - ${new Date(actor.deathday).toLocaleDateString()}`}
+                    </p>
+                  </div>
+                )}
+                
+                {actor.place_of_birth && (
+                  <div>
+                    <p className="text-sm text-slate-500 font-bold uppercase flex items-center gap-1"><MapPin size={14}/> Place of Birth</p>
+                    <p className="font-medium text-slate-800 dark:text-slate-200">{actor.place_of_birth}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Main Content: Bio & Movies */}
+          <div className="flex-1">
+            <h1 className="hidden md:block text-5xl md:text-6xl font-black leading-tight mb-8">{actor.name}</h1>
+            
+            {actor.biography && (
+              <div className="mb-12">
+                <h2 className="text-xl font-bold mb-4 border-l-4 border-blue-500 pl-3 uppercase tracking-widest text-sm">Biography</h2>
+                <div className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed space-y-4">
+                  {actor.biography.split('\n\n').map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {sortedMovies.length > 0 && (
+              <div>
+                <h2 className="text-xl font-bold mb-6 border-l-4 border-yellow-500 pl-3 uppercase tracking-widest text-sm">Known For</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {sortedMovies.slice(0, 12).map((movie) => (
+                    <Link to={`/movie/${movie.id}`} key={movie.id} className="relative block group">
+                      <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-md hover:shadow-blue-500/20 transition-all duration-300 hover:-translate-y-2 border border-slate-200 dark:border-slate-800 group-hover:border-blue-500/50">
+                        <div className="relative aspect-[2/3] overflow-hidden">
+                          <img 
+                            src={movie.poster_path 
+                              ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` 
+                              : "https://via.placeholder.com/300x450?text=No+Poster"} 
+                            alt={movie.title}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="p-3">
+                          <h3 className="font-bold text-sm truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {movie.title}
+                          </h3>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1">
+                            as {movie.character || "Unknown"}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ActorDetails;

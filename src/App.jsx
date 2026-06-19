@@ -7,8 +7,7 @@ import { useMovies } from "./hooks/useMovies";
 import MovieDetails from "./pages/MovieDetails"; 
 import Watchlist from "./pages/Watchlist";
 import { useWatchlist } from "./context/WatchlistContext";
-import Watchlist from "./pages/Watchlist";
-import { useWatchlist } from "./context/WatchlistContext";
+import ActorDetails from "./pages/ActorDetails";
 
 
 const MovieSkeleton = () => (
@@ -206,6 +205,7 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
       <Route path="/movie/:id" element={<MovieDetails />} />
+      <Route path="/actor/:id" element={<ActorDetails />} />
       <Route path="/watchlist" element={<Watchlist searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
     </Routes>
   );
