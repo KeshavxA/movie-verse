@@ -18,7 +18,7 @@ const genres = [
             className={`px-5 py-2 rounded-full whitespace-nowrap transition-all duration-300 font-medium border ${
               selectedGenre === genre.id
                 ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20"
-                : "bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-600 hover:text-white"
+                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-blue-500 dark:hover:border-slate-600 hover:text-blue-600 dark:hover:text-white"
             }`}
           >
             {genre.name}
