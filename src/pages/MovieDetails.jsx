@@ -1,14 +1,25 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Star, Clock, Calendar, DollarSign, Heart, MessageSquare } from "lucide-react";
+import { ArrowLeft, Star, Clock, Calendar, DollarSign, Heart, MessageSquare, Share2, Check } from "lucide-react";
 import { useWatchlist } from "../context/WatchlistContext";
 
 const MovieDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
+  const [copied, setCopied] = useState(false);
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
   const API_KEY = "4fdd0d59a1f17e38b912e065674f80d8"; 
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy link", err);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0); 
@@ -58,16 +69,29 @@ const MovieDetails = () => {
           <div className="flex-1 mt-10 md:mt-20">
             <div className="flex items-center justify-between mb-2">
               <h1 className="text-4xl md:text-6xl font-black leading-tight">{movie.title}</h1>
-              <button
-                onClick={() => toggleWatchlist(movie)}
-                className="ml-4 p-3 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all border border-slate-200 dark:border-slate-700 flex-shrink-0 shadow-sm"
-                title={isInWatchlist(movie.id) ? "Remove from Watchlist" : "Add to Watchlist"}
-              >
-                <Heart 
-                  size={28} 
-                  className={isInWatchlist(movie.id) ? "fill-red-500 text-red-500" : "text-slate-400"} 
-                />
-              </button>
+              <div className="flex items-center gap-3 ml-4 flex-shrink-0">
+                <button
+                  onClick={handleShare}
+                  className="p-3 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
+                  title="Share Movie"
+                >
+                  {copied ? (
+                    <Check size={28} className="text-green-500" />
+                  ) : (
+                    <Share2 size={28} className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" />
+                  )}
+                </button>
+                <button
+                  onClick={() => toggleWatchlist(movie)}
+                  className="p-3 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
+                  title={isInWatchlist(movie.id) ? "Remove from Watchlist" : "Add to Watchlist"}
+                >
+                  <Heart 
+                    size={28} 
+                    className={isInWatchlist(movie.id) ? "fill-red-500 text-red-500" : "text-slate-400 hover:text-red-500 transition-colors"} 
+                  />
+                </button>
+              </div>
             </div>
             <p className="text-blue-600 dark:text-blue-400 text-lg font-medium mb-6">{movie.tagline || "No tagline available"}</p>
             
