@@ -25,6 +25,9 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const [selectedGenre, setSelectedGenre] = useState(0); 
   const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState("popularity.desc");
+  const [decade, setDecade] = useState("");
+  const [language, setLanguage] = useState("");
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
 
   useEffect(() => {
@@ -38,7 +41,11 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
     return () => clearTimeout(timer);
   }, [searchTerm, debouncedTerm]);
 
-  const { movies, loading, loadingMore, hasMore } = useMovies(debouncedTerm, selectedGenre, page);
+  const { movies, loading, loadingMore, hasMore } = useMovies(debouncedTerm, selectedGenre, page, sortBy, decade, language);
+
+  const handleSortChange = (e) => { setSortBy(e.target.value); setPage(1); };
+  const handleDecadeChange = (e) => { setDecade(e.target.value); setPage(1); };
+  const handleLanguageChange = (e) => { setLanguage(e.target.value); setPage(1); };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-blue-500 selection:text-white">
@@ -50,14 +57,57 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
             {searchTerm ? `Searching: ${searchTerm}` : "Explore Movies"}
           </h2>
 
-          <div className="mt-8">
-            <GenreBar 
-              selectedGenre={selectedGenre} 
-              setSelectedGenre={(id) => {
-                setSelectedGenre(id);
-                setPage(1);
-              }} 
-            />
+          <div className="mt-8 flex flex-col xl:flex-row xl:items-center gap-6 justify-between">
+            <div className="flex-1 w-full overflow-hidden">
+              <GenreBar 
+                selectedGenre={selectedGenre} 
+                setSelectedGenre={(id) => {
+                  setSelectedGenre(id);
+                  setPage(1);
+                }} 
+              />
+            </div>
+            
+            {!searchTerm && (
+              <div className="flex flex-wrap items-center gap-3">
+                <select 
+                  value={sortBy} 
+                  onChange={handleSortChange}
+                  className="bg-slate-900 border border-slate-800 text-slate-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 transition-colors cursor-pointer"
+                >
+                  <option value="popularity.desc">Popularity</option>
+                  <option value="vote_average.desc">Highest Rated</option>
+                  <option value="primary_release_date.desc">Release Date</option>
+                </select>
+
+                <select 
+                  value={decade} 
+                  onChange={handleDecadeChange}
+                  className="bg-slate-900 border border-slate-800 text-slate-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 transition-colors cursor-pointer"
+                >
+                  <option value="">Any Decade</option>
+                  <option value="2020">2020s</option>
+                  <option value="2010">2010s</option>
+                  <option value="2000">2000s</option>
+                  <option value="1990">1990s</option>
+                  <option value="1980">1980s</option>
+                </select>
+
+                <select 
+                  value={language} 
+                  onChange={handleLanguageChange}
+                  className="bg-slate-900 border border-slate-800 text-slate-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 transition-colors cursor-pointer"
+                >
+                  <option value="">Any Language</option>
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="ja">Japanese</option>
+                  <option value="ko">Korean</option>
+                  <option value="hi">Hindi</option>
+                </select>
+              </div>
+            )}
           </div>
         </header>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">

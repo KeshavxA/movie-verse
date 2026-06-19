@@ -8,7 +8,7 @@ const BASE_URL = "https://api.themoviedb.org/3";
   @param {number} genreId 
  */
  
-export const useMovies = (query = "", genreId = 0, page = 1) => {
+export const useMovies = (query = "", genreId = 0, page = 1, sortBy = "popularity.desc", decade = "", language = "") => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -28,10 +28,19 @@ export const useMovies = (query = "", genreId = 0, page = 1) => {
 
       if (query) {
         endpoint = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
-      } else if (genreId !== 0) {
-        endpoint = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc&page=${page}`;
       } else {
-        endpoint = `${BASE_URL}/trending/movie/day?api_key=${API_KEY}&page=${page}`;
+        const isDefault = genreId === 0 && sortBy === "popularity.desc" && !decade && !language;
+        if (isDefault) {
+          endpoint = `${BASE_URL}/trending/movie/day?api_key=${API_KEY}&page=${page}`;
+        } else {
+          endpoint = `${BASE_URL}/discover/movie?api_key=${API_KEY}&page=${page}&sort_by=${sortBy}`;
+          if (genreId !== 0) endpoint += `&with_genres=${genreId}`;
+          if (language) endpoint += `&with_original_language=${language}`;
+          if (decade) {
+            const startYear = parseInt(decade);
+            endpoint += `&primary_release_date.gte=${startYear}-01-01&primary_release_date.lte=${startYear + 9}-12-31`;
+          }
+        }
       }
 
       try {
@@ -66,7 +75,7 @@ export const useMovies = (query = "", genreId = 0, page = 1) => {
     };
 
     fetchMovies();
-  }, [query, genreId, page]); 
+  }, [query, genreId, page, sortBy, decade, language]); 
 
   return { movies, loading, loadingMore, hasMore, error };
 };
