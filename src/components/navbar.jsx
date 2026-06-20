@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useWatchlist } from "../context/WatchlistContext";
 import { useTheme } from "../context/ThemeContext";
 
-const Navbar = ({ searchTerm, setSearchTerm }) => {
+const Navbar = ({ searchTerm, setSearchTerm, mediaType, setMediaType }) => {
   const { watchlist } = useWatchlist();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -122,6 +122,23 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
       </div>
 
       <div className="flex items-center gap-4">
+        {setMediaType && (
+          <div className="hidden md:flex bg-slate-100 dark:bg-slate-900 rounded-full p-1 border border-slate-200 dark:border-slate-800">
+            <button
+              onClick={() => { setMediaType("movie"); if (window.location.pathname !== "/") navigate("/"); }}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mediaType === "movie" ? "bg-white dark:bg-slate-800 shadow-sm text-blue-600 dark:text-blue-400" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}
+            >
+              Movies
+            </button>
+            <button
+              onClick={() => { setMediaType("tv"); if (window.location.pathname !== "/") navigate("/"); }}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mediaType === "tv" ? "bg-white dark:bg-slate-800 shadow-sm text-blue-600 dark:text-blue-400" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}
+            >
+              TV Shows
+            </button>
+          </div>
+        )}
+
         <button 
           onClick={toggleTheme}
           className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"

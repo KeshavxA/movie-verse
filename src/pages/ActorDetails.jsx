@@ -10,7 +10,7 @@ const ActorDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&append_to_response=movie_credits`)
+    fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&append_to_response=combined_credits`)
       .then((res) => res.json())
       .then((data) => setActor(data))
       .catch((err) => console.error(err));
@@ -22,9 +22,9 @@ const ActorDetails = () => {
     </div>
   );
 
-  // Sort movie credits by popularity to show top movies first
-  const sortedMovies = actor.movie_credits?.cast
-    ? [...actor.movie_credits.cast].sort((a, b) => b.popularity - a.popularity)
+  // Sort combined credits by popularity to show top roles first
+  const sortedCredits = actor.combined_credits?.cast
+    ? [...actor.combined_credits.cast].sort((a, b) => b.popularity - a.popularity)
     : [];
 
   return (
@@ -94,29 +94,29 @@ const ActorDetails = () => {
               </div>
             )}
 
-            {sortedMovies.length > 0 && (
+            {sortedCredits.length > 0 && (
               <div>
                 <h2 className="text-xl font-bold mb-6 border-l-4 border-yellow-500 pl-3 uppercase tracking-widest text-sm">Known For</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {sortedMovies.slice(0, 12).map((movie) => (
-                    <Link to={`/movie/${movie.id}`} key={movie.id} className="relative block group">
+                  {sortedCredits.slice(0, 12).map((media) => (
+                    <Link to={`/${media.media_type}/${media.id}`} key={`${media.media_type}-${media.id}`} className="relative block group">
                       <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-md hover:shadow-blue-500/20 transition-all duration-300 hover:-translate-y-2 border border-slate-200 dark:border-slate-800 group-hover:border-blue-500/50">
                         <div className="relative aspect-[2/3] overflow-hidden">
                           <img 
-                            src={movie.poster_path 
-                              ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` 
+                            src={media.poster_path 
+                              ? `https://image.tmdb.org/t/p/w300${media.poster_path}` 
                               : "https://via.placeholder.com/300x450?text=No+Poster"} 
-                            alt={movie.title}
+                            alt={media.title || media.name}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             loading="lazy"
                           />
                         </div>
                         <div className="p-3">
                           <h3 className="font-bold text-sm truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                            {movie.title}
+                            {media.title || media.name}
                           </h3>
                           <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1">
-                            as {movie.character || "Unknown"}
+                            as {media.character || "Unknown"}
                           </p>
                         </div>
                       </div>

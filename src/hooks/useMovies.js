@@ -8,7 +8,7 @@ const BASE_URL = "https://api.themoviedb.org/3";
   @param {number[]} genreIds 
  */
  
-export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popularity.desc", decade = "", language = "", maxRuntime = null, providers = []) => {
+export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popularity.desc", decade = "", language = "", maxRuntime = null, providers = [], mediaType = "movie") => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -27,18 +27,19 @@ export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popular
       let endpoint = "";
 
       if (query) {
-        endpoint = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
+        endpoint = `${BASE_URL}/search/${mediaType}?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
       } else {
         const isDefault = genreIds.length === 0 && sortBy === "popularity.desc" && !decade && !language && !maxRuntime && providers.length === 0;
         if (isDefault) {
-          endpoint = `${BASE_URL}/trending/movie/day?api_key=${API_KEY}&page=${page}`;
+          endpoint = `${BASE_URL}/trending/${mediaType}/day?api_key=${API_KEY}&page=${page}`;
         } else {
-          endpoint = `${BASE_URL}/discover/movie?api_key=${API_KEY}&page=${page}&sort_by=${sortBy}`;
+          endpoint = `${BASE_URL}/discover/${mediaType}?api_key=${API_KEY}&page=${page}&sort_by=${sortBy}`;
           if (genreIds.length > 0) endpoint += `&with_genres=${genreIds.join(',')}`;
           if (language) endpoint += `&with_original_language=${language}`;
           if (decade) {
             const startYear = parseInt(decade);
-            endpoint += `&primary_release_date.gte=${startYear}-01-01&primary_release_date.lte=${startYear + 9}-12-31`;
+            const dateField = mediaType === "movie" ? "primary_release_date" : "first_air_date";
+            endpoint += `&${dateField}.gte=${startYear}-01-01&${dateField}.lte=${startYear + 9}-12-31`;
           }
           if (maxRuntime) {
             endpoint += `&with_runtime.lte=${maxRuntime}`;
@@ -81,7 +82,7 @@ export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popular
     };
 
     fetchMovies();
-  }, [query, genreIds.join(','), page, sortBy, decade, language, maxRuntime, providers.join(',')]); 
+  }, [query, genreIds.join(','), page, sortBy, decade, language, maxRuntime, providers.join(','), mediaType]); 
 
   return { movies, loading, loadingMore, hasMore, error };
 };
