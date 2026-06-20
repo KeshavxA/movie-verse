@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Star, Clock, Calendar, DollarSign, Heart, MessageSquare, Share2, Check } from "lucide-react";
 import { useWatchlist } from "../context/WatchlistContext";
+import FinancialChart from "../components/FinancialChart";
 
 const MovieDetails = () => {
   const { id } = useParams();
@@ -138,16 +139,11 @@ const MovieDetails = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-8 py-8 border-t border-slate-200 dark:border-slate-900">
-              <div>
-                <p className="text-slate-500 text-xs font-bold uppercase mb-1">Budget</p>
-                <p className="text-2xl font-mono text-green-500">${movie.budget?.toLocaleString() || "N/A"}</p>
+            {(movie.budget > 0 || movie.revenue > 0) && (
+              <div className="py-8 border-t border-slate-200 dark:border-slate-900">
+                <FinancialChart budget={movie.budget} revenue={movie.revenue} />
               </div>
-              <div>
-                <p className="text-slate-500 text-xs font-bold uppercase mb-1">Revenue</p>
-                <p className="text-2xl font-mono text-blue-500">${movie.revenue?.toLocaleString() || "N/A"}</p>
-              </div>
-            </div>
+            )}
 
             {trailer && (
               <div className="mt-10">

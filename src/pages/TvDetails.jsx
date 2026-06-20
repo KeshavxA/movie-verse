@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Star, Clock, Calendar, Heart, MessageSquare, Share2, Check, Tv } from "lucide-react";
 import { useWatchlist } from "../context/WatchlistContext";
+import SeasonChart from "../components/SeasonChart";
 
 const TvDetails = () => {
   const { id } = useParams();
@@ -141,22 +142,27 @@ const TvDetails = () => {
             {show.seasons && show.seasons.length > 0 && (
               <div className="mb-10">
                 <h2 className="text-xl font-bold mb-6 border-l-4 border-blue-500 pl-3 uppercase tracking-widest text-sm">Seasons</h2>
-                <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
-                  {show.seasons.map((season) => (
-                    <div key={season.id} className="flex-shrink-0 w-40 group block">
-                      <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800 transition-all duration-300 relative">
-                        <img 
-                          src={season.poster_path ? `https://image.tmdb.org/t/p/w300${season.poster_path}` : "https://via.placeholder.com/300x450?text=No+Poster"} 
-                          alt={season.name} 
-                          className="w-full h-60 object-cover"
-                        />
-                        <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
-                          <p className="font-bold text-sm truncate text-slate-900 dark:text-white">{season.name}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{season.episode_count} Episodes</p>
+                <div className="flex flex-col xl:flex-row gap-8 items-start">
+                  <div className="w-full xl:w-2/3 flex gap-4 overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
+                    {show.seasons.map((season) => (
+                      <div key={season.id} className="flex-shrink-0 w-40 group block">
+                        <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800 transition-all duration-300 relative">
+                          <img 
+                            src={season.poster_path ? `https://image.tmdb.org/t/p/w300${season.poster_path}` : "https://via.placeholder.com/300x450?text=No+Poster"} 
+                            alt={season.name} 
+                            className="w-full h-60 object-cover"
+                          />
+                          <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+                            <p className="font-bold text-sm truncate text-slate-900 dark:text-white">{season.name}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{season.episode_count} Episodes</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                  <div className="w-full xl:w-1/3">
+                    <SeasonChart seasons={show.seasons} />
+                  </div>
                 </div>
               </div>
             )}

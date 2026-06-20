@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, MapPin, Calendar } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, TrendingUp } from "lucide-react";
+import CareerChart from "../components/CareerChart";
 
 const ActorDetails = () => {
   const { id } = useParams();
@@ -90,6 +91,18 @@ const ActorDetails = () => {
                   {actor.biography.split('\n\n').map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {actor.combined_credits?.cast && actor.combined_credits.cast.length > 0 && (
+              <div className="mb-12">
+                <h2 className="text-xl font-bold mb-4 border-l-4 border-green-500 pl-3 uppercase tracking-widest text-sm flex items-center gap-2">
+                  <TrendingUp size={18} /> Career Trajectory
+                </h2>
+                <p className="text-slate-500 text-sm mb-2">Average project rating by year</p>
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-md">
+                  <CareerChart credits={actor.combined_credits.cast} />
                 </div>
               </div>
             )}
