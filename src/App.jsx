@@ -27,7 +27,15 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
   const [sortBy, setSortBy] = useState("popularity.desc");
   const [decade, setDecade] = useState("");
   const [language, setLanguage] = useState("");
+  const [nowPlaying, setNowPlaying] = useState([]);
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
+
+  useEffect(() => {
+    fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=4fdd0d59a1f17e38b912e065674f80d8&language=en-US&page=1`)
+      .then((res) => res.json())
+      .then((data) => setNowPlaying(data.results || []))
+      .catch((err) => console.error(err));
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -55,6 +63,39 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
           <h2 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-slate-700 to-slate-500 dark:from-white dark:via-slate-300 dark:to-slate-500 bg-clip-text text-transparent">
             {searchTerm ? `Searching: ${searchTerm}` : "Explore Movies"}
           </h2>
+
+          {!searchTerm && nowPlaying.length > 0 && (
+            <div className="mt-12 mb-16">
+              <h3 className="text-2xl font-bold mb-6 border-l-4 border-red-500 pl-3 uppercase tracking-widest text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+                Now Playing in Theaters
+              </h3>
+              <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
+                {nowPlaying.map((movie) => (
+                  <Link to={`/movie/${movie.id}`} key={movie.id} className="flex-shrink-0 w-48 group block">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800 group-hover:border-red-500/50 transition-all duration-300 group-hover:-translate-y-2 relative">
+                      <div className="relative aspect-[2/3] overflow-hidden">
+                        <img 
+                          src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "https://via.placeholder.com/500x750?text=No+Poster"} 
+                          alt={movie.title} 
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/70 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-yellow-600 dark:text-yellow-400 border border-slate-200 dark:border-white/10 shadow-sm">
+                          ⭐ {movie.vote_average?.toFixed(1)}
+                        </div>
+                      </div>
+                      <div className="p-3 absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-12">
+                        <p className="font-bold text-sm truncate text-white group-hover:text-red-400 transition-colors">{movie.title}</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="mt-8 flex flex-col xl:flex-row xl:items-center gap-6 justify-between">
             <div className="flex-1 w-full overflow-hidden">
