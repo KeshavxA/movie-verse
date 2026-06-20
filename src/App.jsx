@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
-import { Heart } from "lucide-react";
+import { Heart, Filter } from "lucide-react";
 import Navbar from "./components/Navbar";
-import GenreBar from "./components/GenreBar"; 
+import FilterSidebar from "./components/FilterSidebar";
 import { useMovies } from "./hooks/useMovies"; 
 import MovieDetails from "./pages/MovieDetails"; 
 import Watchlist from "./pages/Watchlist";
@@ -24,11 +24,14 @@ const MovieSkeleton = () => (
 
 const HomePage = ({ searchTerm, setSearchTerm }) => {
   const [debouncedTerm, setDebouncedTerm] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState(0); 
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState("popularity.desc");
   const [decade, setDecade] = useState("");
   const [language, setLanguage] = useState("");
+  const [selectedGenres, setSelectedGenres] = useState([]);
+  const [maxRuntime, setMaxRuntime] = useState(null);
+  const [selectedProviders, setSelectedProviders] = useState([]);
+  const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState(false);
   const [nowPlaying, setNowPlaying] = useState([]);
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
 
@@ -44,13 +47,21 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
       if (debouncedTerm !== searchTerm) {
         setDebouncedTerm(searchTerm);
         setPage(1);
-        if(searchTerm) setSelectedGenre(0);
       }
     }, 500);
     return () => clearTimeout(timer);
   }, [searchTerm, debouncedTerm]);
 
-  const { movies, loading, loadingMore, hasMore } = useMovies(debouncedTerm, selectedGenre, page, sortBy, decade, language);
+  const { movies, loading, loadingMore, hasMore } = useMovies(
+    debouncedTerm,
+    selectedGenres,
+    page,
+    sortBy,
+    decade,
+    language,
+    maxRuntime,
+    selectedProviders
+  );
 
   const handleSortChange = (e) => { setSortBy(e.target.value); setPage(1); };
   const handleDecadeChange = (e) => { setDecade(e.target.value); setPage(1); };
@@ -99,56 +110,20 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
             </div>
           )}
 
-          <div className="mt-8 flex flex-col xl:flex-row xl:items-center gap-6 justify-between">
-            <div className="flex-1 w-full overflow-hidden">
-              <GenreBar 
-                selectedGenre={selectedGenre} 
-                setSelectedGenre={(id) => {
-                  setSelectedGenre(id);
-                  setPage(1);
-                }} 
-              />
-            </div>
-            
+          <div className="mt-8 flex flex-col xl:flex-row xl:items-center gap-6 justify-between border-b border-slate-200 dark:border-slate-800 pb-6">
             {!searchTerm && (
-              <div className="flex flex-wrap items-center gap-3">
-                <select 
-                  value={sortBy} 
-                  onChange={handleSortChange}
-                  className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 transition-colors cursor-pointer"
-                >
-                  <option value="popularity.desc">Popularity</option>
-                  <option value="vote_average.desc">Highest Rated</option>
-                  <option value="primary_release_date.desc">Release Date</option>
-                </select>
-
-                <select 
-                  value={decade} 
-                  onChange={handleDecadeChange}
-                  className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 transition-colors cursor-pointer"
-                >
-                  <option value="">Any Decade</option>
-                  <option value="2020">2020s</option>
-                  <option value="2010">2010s</option>
-                  <option value="2000">2000s</option>
-                  <option value="1990">1990s</option>
-                  <option value="1980">1980s</option>
-                </select>
-
-                <select 
-                  value={language} 
-                  onChange={handleLanguageChange}
-                  className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 transition-colors cursor-pointer"
-                >
-                  <option value="">Any Language</option>
-                  <option value="en">English</option>
-                  <option value="es">Spanish</option>
-                  <option value="fr">French</option>
-                  <option value="ja">Japanese</option>
-                  <option value="ko">Korean</option>
-                  <option value="hi">Hindi</option>
-                </select>
-              </div>
+              <button
+                onClick={() => setIsFilterSidebarOpen(true)}
+                className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 px-6 py-3 rounded-xl font-bold shadow-sm hover:shadow-md hover:border-blue-500 transition-all duration-300 ml-auto"
+              >
+                <Filter size={20} />
+                Filters & Sort
+                {(selectedGenres.length > 0 || sortBy !== "popularity.desc" || decade || language || maxRuntime || selectedProviders.length > 0) && (
+                  <span className="flex items-center justify-center bg-blue-600 text-white text-xs rounded-full h-5 w-5 ml-1">
+                    !
+                  </span>
+                )}
+              </button>
             )}
           </div>
         </header>
@@ -209,7 +184,16 @@ const HomePage = ({ searchTerm, setSearchTerm }) => {
               <div className="text-6xl mb-4">🎬</div>
               <h3 className="text-xl text-slate-600 dark:text-slate-400 font-medium">No movies found for this category.</h3>
               <button 
-                onClick={() => {setSearchTerm(""); setSelectedGenre(0)}}
+                onClick={() => {
+                  setSearchTerm(""); 
+                  setSelectedGenres([]);
+                  setSortBy("popularity.desc");
+                  setDecade("");
+                  setLanguage("");
+                  setMaxRuntime(null);
+                  setSelectedProviders([]);
+                  setPage(1);
+                }}
                 className="mt-4 text-blue-600 dark:text-blue-500 hover:underline"
               >
                 Clear all filters

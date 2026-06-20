@@ -5,10 +5,10 @@ const BASE_URL = "https://api.themoviedb.org/3";
 
 /** 
   @param {string} query 
-  @param {number} genreId 
+  @param {number[]} genreIds 
  */
  
-export const useMovies = (query = "", genreId = 0, page = 1, sortBy = "popularity.desc", decade = "", language = "") => {
+export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popularity.desc", decade = "", language = "", maxRuntime = null, providers = []) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -29,16 +29,22 @@ export const useMovies = (query = "", genreId = 0, page = 1, sortBy = "popularit
       if (query) {
         endpoint = `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
       } else {
-        const isDefault = genreId === 0 && sortBy === "popularity.desc" && !decade && !language;
+        const isDefault = genreIds.length === 0 && sortBy === "popularity.desc" && !decade && !language && !maxRuntime && providers.length === 0;
         if (isDefault) {
           endpoint = `${BASE_URL}/trending/movie/day?api_key=${API_KEY}&page=${page}`;
         } else {
           endpoint = `${BASE_URL}/discover/movie?api_key=${API_KEY}&page=${page}&sort_by=${sortBy}`;
-          if (genreId !== 0) endpoint += `&with_genres=${genreId}`;
+          if (genreIds.length > 0) endpoint += `&with_genres=${genreIds.join(',')}`;
           if (language) endpoint += `&with_original_language=${language}`;
           if (decade) {
             const startYear = parseInt(decade);
             endpoint += `&primary_release_date.gte=${startYear}-01-01&primary_release_date.lte=${startYear + 9}-12-31`;
+          }
+          if (maxRuntime) {
+            endpoint += `&with_runtime.lte=${maxRuntime}`;
+          }
+          if (providers.length > 0) {
+            endpoint += `&with_watch_providers=${providers.join('|')}&watch_region=US`;
           }
         }
       }
@@ -75,7 +81,7 @@ export const useMovies = (query = "", genreId = 0, page = 1, sortBy = "popularit
     };
 
     fetchMovies();
-  }, [query, genreId, page, sortBy, decade, language]); 
+  }, [query, genreIds.join(','), page, sortBy, decade, language, maxRuntime, providers.join(',')]); 
 
   return { movies, loading, loadingMore, hasMore, error };
 };
