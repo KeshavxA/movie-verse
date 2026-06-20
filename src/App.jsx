@@ -12,7 +12,8 @@ import ScrollToTop from "./components/ScrollToTop";
 
 
 const MovieSkeleton = () => (
-  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden animate-pulse border border-slate-200 dark:border-slate-800">
+  <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 relative shadow-sm">
+    <div className="absolute inset-0 z-10 w-full h-full bg-gradient-to-r from-transparent via-white/40 dark:via-white/5 to-transparent animate-[shimmer_1.5s_infinite]" style={{ backgroundSize: '200% 100%' }} />
     <div className="aspect-[2/3] bg-slate-200 dark:bg-slate-800" />
     <div className="p-4 space-y-3">
       <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4" />
