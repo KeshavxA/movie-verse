@@ -8,6 +8,7 @@ import MovieDetails from "./pages/MovieDetails";
 import Watchlist from "./pages/Watchlist";
 import { useWatchlist } from "./context/WatchlistContext";
 import ActorDetails from "./pages/ActorDetails";
+import ScrollToTop from "./components/ScrollToTop";
 
 
 const MovieSkeleton = () => (
@@ -243,12 +244,15 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
 
   return (
-    <Routes>
-      <Route path="/" element={<HomePage searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
-      <Route path="/movie/:id" element={<MovieDetails />} />
-      <Route path="/actor/:id" element={<ActorDetails />} />
-      <Route path="/watchlist" element={<Watchlist searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<HomePage searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
+        <Route path="/movie/:id" element={<MovieDetails />} />
+        <Route path="/actor/:id" element={<ActorDetails />} />
+        <Route path="/watchlist" element={<Watchlist searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
+      </Routes>
+      <ScrollToTop />
+    </>
   );
 }
 
