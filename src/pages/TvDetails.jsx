@@ -4,6 +4,7 @@ import { ArrowLeft, Star, Clock, Calendar, Heart, MessageSquare, Share2, Check, 
 import { useWatchlist } from "../context/WatchlistContext";
 import SeasonChart from "../components/SeasonChart";
 import WatchProviders from "../components/WatchProviders";
+import ImageGallery from "../components/ImageGallery";
 import { useLanguage } from "../context/LanguageContext";
 
 const TvDetails = () => {
@@ -27,7 +28,7 @@ const TvDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0); 
-    fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar,reviews,watch/providers&language=${lang}`)
+    fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar,reviews,watch/providers,images&include_image_language=en,null&language=${lang}`)
       .then((res) => res.json())
       .then((data) => setShow(data))
       .catch((err) => console.error(err));
@@ -190,6 +191,10 @@ const TvDetails = () => {
                   ></iframe>
                 </div>
               </div>
+            )}
+
+            {show.images && (
+              <ImageGallery images={show.images} />
             )}
 
             {show.similar?.results?.length > 0 && (

@@ -35,7 +35,10 @@ export const translations = {
     collections: "Collections",
     yourWatchlistIsEmpty: "This collection is empty.",
     exploreToAdd: "Explore to add items",
-    details: "Details"
+    details: "Details",
+    imageGallery: "Image Gallery",
+    backdrops: "Backdrops",
+    posters: "Posters"
   },
   "es-ES": {
     searchPlaceholder: "Buscar películas...",
@@ -73,7 +76,10 @@ export const translations = {
     collections: "Colecciones",
     yourWatchlistIsEmpty: "Esta colección está vacía.",
     exploreToAdd: "Explorar para añadir",
-    details: "Detalles"
+    details: "Detalles",
+    imageGallery: "Galería de Imágenes",
+    backdrops: "Fondos",
+    posters: "Pósteres"
   },
   "fr-FR": {
     searchPlaceholder: "Rechercher des films...",
@@ -111,7 +117,10 @@ export const translations = {
     collections: "Collections",
     yourWatchlistIsEmpty: "Cette collection est vide.",
     exploreToAdd: "Explorer pour ajouter",
-    details: "Détails"
+    details: "Détails",
+    imageGallery: "Galerie d'Images",
+    backdrops: "Fonds d'écran",
+    posters: "Affiches"
   },
   "hi-IN": {
     searchPlaceholder: "फिल्में खोजें...",
@@ -149,6 +158,9 @@ export const translations = {
     collections: "संग्रह",
     yourWatchlistIsEmpty: "यह संग्रह खाली है।",
     exploreToAdd: "जोड़ने के लिए एक्सप्लोर करें",
-    details: "विवरण"
+    details: "विवरण",
+    imageGallery: "छवि गैलरी",
+    backdrops: "पृष्ठभूमि",
+    posters: "पोस्टर"
   }
 };

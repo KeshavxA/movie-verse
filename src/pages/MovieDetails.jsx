@@ -4,6 +4,7 @@ import { ArrowLeft, Star, Clock, Calendar, DollarSign, Heart, MessageSquare, Sha
 import { useWatchlist } from "../context/WatchlistContext";
 import FinancialChart from "../components/FinancialChart";
 import WatchProviders from "../components/WatchProviders";
+import ImageGallery from "../components/ImageGallery";
 import { useLanguage } from "../context/LanguageContext";
 
 const MovieDetails = () => {
@@ -27,7 +28,7 @@ const MovieDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0); 
-    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar,reviews,watch/providers&language=${lang}`)
+    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar,reviews,watch/providers,images&include_image_language=en,null&language=${lang}`)
       .then((res) => res.json())
       .then((data) => setMovie(data))
       .catch((err) => console.error(err));
@@ -168,6 +169,10 @@ const MovieDetails = () => {
                   ></iframe>
                 </div>
               </div>
+            )}
+
+            {movie.images && (
+              <ImageGallery images={movie.images} />
             )}
 
             {movie.similar?.results && movie.similar.results.length > 0 && (
