@@ -3,13 +3,14 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Star, Clock, Calendar, Heart, MessageSquare, Share2, Check, Tv } from "lucide-react";
 import { useWatchlist } from "../context/WatchlistContext";
 import SeasonChart from "../components/SeasonChart";
+import WatchProviders from "../components/WatchProviders";
 
 const TvDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [show, setShow] = useState(null);
   const [copied, setCopied] = useState(false);
-  const { isInWatchlist, toggleWatchlist } = useWatchlist();
+  const { isInAnyPlaylist, toggleWatchlist } = useWatchlist();
   const API_KEY = "4fdd0d59a1f17e38b912e065674f80d8"; 
 
   const handleShare = async () => {
@@ -24,7 +25,7 @@ const TvDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0); 
-    fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar,reviews`)
+    fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar,reviews,watch/providers`)
       .then((res) => res.json())
       .then((data) => setShow(data))
       .catch((err) => console.error(err));
@@ -83,13 +84,13 @@ const TvDetails = () => {
                   )}
                 </button>
                 <button
-                  onClick={() => toggleWatchlist({ ...show, media_type: "tv" })}
+                  onClick={() => toggleWatchlist({ ...show, media_type: 'tv' })}
                   className="p-3 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
-                  title={isInWatchlist(show.id) ? "Remove from Watchlist" : "Add to Watchlist"}
+                  title="Save to Collection"
                 >
                   <Heart 
                     size={28} 
-                    className={isInWatchlist(show.id) ? "fill-red-500 text-red-500" : "text-slate-400 hover:text-red-500 transition-colors"} 
+                    className={isInAnyPlaylist(show.id) ? "fill-red-500 text-red-500" : "text-slate-400 hover:text-red-500 transition-colors"} 
                   />
                 </button>
               </div>
@@ -164,6 +165,12 @@ const TvDetails = () => {
                     <SeasonChart seasons={show.seasons} />
                   </div>
                 </div>
+              </div>
+            )}
+
+            {show['watch/providers']?.results && (
+              <div className="py-8 border-t border-slate-200 dark:border-slate-900">
+                <WatchProviders providers={show['watch/providers'].results} />
               </div>
             )}
 

@@ -10,6 +10,7 @@ import Watchlist from "./pages/Watchlist";
 import { useWatchlist } from "./context/WatchlistContext";
 import ActorDetails from "./pages/ActorDetails";
 import ScrollToTop from "./components/ScrollToTop";
+import AddToPlaylistModal from "./components/AddToPlaylistModal";
 
 
 const MovieSkeleton = () => (
@@ -34,7 +35,7 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
   const [selectedProviders, setSelectedProviders] = useState([]);
   const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState(false);
   const [nowPlaying, setNowPlaying] = useState([]);
-  const { isInWatchlist, toggleWatchlist } = useWatchlist();
+  const { isInAnyPlaylist, toggleWatchlist } = useWatchlist();
 
   useEffect(() => {
     const endpoint = mediaType === "movie" ? "movie/now_playing" : "tv/airing_today";
@@ -177,7 +178,7 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
                 >
                   <Heart 
                     size={18} 
-                    className={isInWatchlist(item.id) ? "fill-red-500 text-red-500" : "text-slate-400 dark:text-white"} 
+                    className={isInAnyPlaylist(item.id) ? "fill-red-500 text-red-500" : "text-slate-400 dark:text-white"} 
                   />
                 </button>
               </div>
@@ -243,6 +244,7 @@ function App() {
         <Route path="/watchlist" element={<Watchlist searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
       </Routes>
       <ScrollToTop />
+      <AddToPlaylistModal />
     </>
   );
 }

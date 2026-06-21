@@ -3,13 +3,14 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Star, Clock, Calendar, DollarSign, Heart, MessageSquare, Share2, Check } from "lucide-react";
 import { useWatchlist } from "../context/WatchlistContext";
 import FinancialChart from "../components/FinancialChart";
+import WatchProviders from "../components/WatchProviders";
 
 const MovieDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
   const [copied, setCopied] = useState(false);
-  const { isInWatchlist, toggleWatchlist } = useWatchlist();
+  const { isInAnyPlaylist, toggleWatchlist } = useWatchlist();
   const API_KEY = "4fdd0d59a1f17e38b912e065674f80d8"; 
 
   const handleShare = async () => {
@@ -24,7 +25,7 @@ const MovieDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0); 
-    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar,reviews`)
+    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar,reviews,watch/providers`)
       .then((res) => res.json())
       .then((data) => setMovie(data))
       .catch((err) => console.error(err));
@@ -83,13 +84,13 @@ const MovieDetails = () => {
                   )}
                 </button>
                 <button
-                  onClick={() => toggleWatchlist(movie)}
+                  onClick={() => toggleWatchlist({ ...movie, media_type: 'movie' })}
                   className="p-3 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
-                  title={isInWatchlist(movie.id) ? "Remove from Watchlist" : "Add to Watchlist"}
+                  title="Save to Collection"
                 >
                   <Heart 
                     size={28} 
-                    className={isInWatchlist(movie.id) ? "fill-red-500 text-red-500" : "text-slate-400 hover:text-red-500 transition-colors"} 
+                    className={isInAnyPlaylist(movie.id) ? "fill-red-500 text-red-500" : "text-slate-400 hover:text-red-500 transition-colors"} 
                   />
                 </button>
               </div>
@@ -142,6 +143,12 @@ const MovieDetails = () => {
             {(movie.budget > 0 || movie.revenue > 0) && (
               <div className="py-8 border-t border-slate-200 dark:border-slate-900">
                 <FinancialChart budget={movie.budget} revenue={movie.revenue} />
+              </div>
+            )}
+
+            {movie['watch/providers']?.results && (
+              <div className="py-8 border-t border-slate-200 dark:border-slate-900">
+                <WatchProviders providers={movie['watch/providers'].results} />
               </div>
             )}
 
