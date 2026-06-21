@@ -3,10 +3,12 @@ import { Search, Film, X, Heart, Sun, Moon, History, Trash2 } from "lucide-react
 import { Link, useNavigate } from "react-router-dom";
 import { useWatchlist } from "../context/WatchlistContext";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 const Navbar = ({ searchTerm, setSearchTerm, mediaType, setMediaType }) => {
   const { watchlist } = useWatchlist();
   const { theme, toggleTheme } = useTheme();
+  const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
   
   const [searchHistory, setSearchHistory] = useState([]);
@@ -60,7 +62,7 @@ const Navbar = ({ searchTerm, setSearchTerm, mediaType, setMediaType }) => {
       <div className="relative w-1/2 md:w-1/3 group">
         <input
           type="text"
-          placeholder="Search movies..."
+          placeholder={mediaType === "tv" ? t('searchTvPlaceholder') : t('searchPlaceholder')}
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -128,16 +130,27 @@ const Navbar = ({ searchTerm, setSearchTerm, mediaType, setMediaType }) => {
               onClick={() => { setMediaType("movie"); if (window.location.pathname !== "/") navigate("/"); }}
               className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mediaType === "movie" ? "bg-white dark:bg-slate-800 shadow-sm text-blue-600 dark:text-blue-400" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}
             >
-              Movies
+              {t('movies')}
             </button>
             <button
               onClick={() => { setMediaType("tv"); if (window.location.pathname !== "/") navigate("/"); }}
               className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mediaType === "tv" ? "bg-white dark:bg-slate-800 shadow-sm text-blue-600 dark:text-blue-400" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}
             >
-              TV Shows
+              {t('tvShows')}
             </button>
           </div>
         )}
+
+        <select
+          value={lang}
+          onChange={(e) => setLang(e.target.value)}
+          className="bg-transparent text-sm font-medium text-slate-600 dark:text-slate-300 border-none outline-none cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+        >
+          <option value="en-US">EN</option>
+          <option value="es-ES">ES</option>
+          <option value="fr-FR">FR</option>
+          <option value="hi-IN">HI</option>
+        </select>
 
         <button 
           onClick={toggleTheme}
@@ -158,7 +171,7 @@ const Navbar = ({ searchTerm, setSearchTerm, mediaType, setMediaType }) => {
             )}
           </div>
           <p className="hidden md:block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-widest group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-            Watchlist
+            {t('watchlist')}
           </p>
         </Link>
       </div>

@@ -1,6 +1,8 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 const WatchProviders = ({ providers }) => {
+  const { t } = useLanguage();
   if (!providers) return null;
 
   // TMDB's US region providers are generally found at providers.US
@@ -36,7 +38,7 @@ const WatchProviders = ({ providers }) => {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-md">
       <div className="mb-4">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Where to Watch</h3>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{t('whereToWatch')}</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400">Available providers in the US</p>
       </div>
       

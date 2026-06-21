@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLanguage } from "../context/LanguageContext";
 
 const API_KEY = "4fdd0d59a1f17e38b912e065674f80d8"; 
 const BASE_URL = "https://api.themoviedb.org/3";
@@ -14,6 +15,7 @@ export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popular
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState(null);
+  const { lang } = useLanguage();
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -27,13 +29,13 @@ export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popular
       let endpoint = "";
 
       if (query) {
-        endpoint = `${BASE_URL}/search/${mediaType}?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}`;
+        endpoint = `${BASE_URL}/search/${mediaType}?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}&language=${lang}`;
       } else {
         const isDefault = genreIds.length === 0 && sortBy === "popularity.desc" && !decade && !language && !maxRuntime && providers.length === 0;
         if (isDefault) {
-          endpoint = `${BASE_URL}/trending/${mediaType}/day?api_key=${API_KEY}&page=${page}`;
+          endpoint = `${BASE_URL}/trending/${mediaType}/day?api_key=${API_KEY}&page=${page}&language=${lang}`;
         } else {
-          endpoint = `${BASE_URL}/discover/${mediaType}?api_key=${API_KEY}&page=${page}&sort_by=${sortBy}`;
+          endpoint = `${BASE_URL}/discover/${mediaType}?api_key=${API_KEY}&page=${page}&sort_by=${sortBy}&language=${lang}`;
           if (genreIds.length > 0) endpoint += `&with_genres=${genreIds.join(',')}`;
           if (language) endpoint += `&with_original_language=${language}`;
           if (decade) {
@@ -82,7 +84,7 @@ export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popular
     };
 
     fetchMovies();
-  }, [query, genreIds.join(','), page, sortBy, decade, language, maxRuntime, providers.join(','), mediaType]); 
+  }, [query, genreIds.join(','), page, sortBy, decade, language, maxRuntime, providers.join(','), mediaType, lang]); 
 
   return { movies, loading, loadingMore, hasMore, error };
 };

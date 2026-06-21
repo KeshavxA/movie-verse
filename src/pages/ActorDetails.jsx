@@ -2,20 +2,22 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, TrendingUp } from "lucide-react";
 import CareerChart from "../components/CareerChart";
+import { useLanguage } from "../context/LanguageContext";
 
 const ActorDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [actor, setActor] = useState(null);
+  const { lang, t } = useLanguage();
   const API_KEY = "4fdd0d59a1f17e38b912e065674f80d8";
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&append_to_response=combined_credits`)
+    fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&append_to_response=combined_credits&language=${lang}`)
       .then((res) => res.json())
       .then((data) => setActor(data))
       .catch((err) => console.error(err));
-  }, [id]);
+  }, [id, lang]);
 
   if (!actor) return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
@@ -56,7 +58,7 @@ const ActorDetails = () => {
                 <h3 className="text-lg font-bold border-b border-slate-200 dark:border-slate-800 pb-2">Personal Info</h3>
                 
                 <div>
-                  <p className="text-sm text-slate-500 font-bold uppercase">Known For</p>
+                  <p className="text-sm text-slate-500 font-bold uppercase">{t('knownFor')}</p>
                   <p className="font-medium text-slate-800 dark:text-slate-200">{actor.known_for_department || "Acting"}</p>
                 </div>
                 
@@ -86,7 +88,7 @@ const ActorDetails = () => {
             
             {actor.biography && (
               <div className="mb-12">
-                <h2 className="text-xl font-bold mb-4 border-l-4 border-blue-500 pl-3 uppercase tracking-widest text-sm">Biography</h2>
+                <h2 className="text-xl font-bold mb-4 border-l-4 border-blue-500 pl-3 uppercase tracking-widest text-sm">{t('biography')}</h2>
                 <div className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed space-y-4">
                   {actor.biography.split('\n\n').map((paragraph, index) => (
                     <p key={index}>{paragraph}</p>
@@ -98,7 +100,7 @@ const ActorDetails = () => {
             {actor.combined_credits?.cast && actor.combined_credits.cast.length > 0 && (
               <div className="mb-12">
                 <h2 className="text-xl font-bold mb-4 border-l-4 border-green-500 pl-3 uppercase tracking-widest text-sm flex items-center gap-2">
-                  <TrendingUp size={18} /> Career Trajectory
+                  <TrendingUp size={18} /> {t('careerTrajectory')}
                 </h2>
                 <p className="text-slate-500 text-sm mb-2">Average project rating by year</p>
                 <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-md">
@@ -109,7 +111,7 @@ const ActorDetails = () => {
 
             {sortedCredits.length > 0 && (
               <div>
-                <h2 className="text-xl font-bold mb-6 border-l-4 border-yellow-500 pl-3 uppercase tracking-widest text-sm">Known For</h2>
+                <h2 className="text-xl font-bold mb-6 border-l-4 border-yellow-500 pl-3 uppercase tracking-widest text-sm">{t('knownFor')}</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {sortedCredits.slice(0, 12).map((media) => (
                     <Link to={`/${media.media_type}/${media.id}`} key={`${media.media_type}-${media.id}`} className="relative block group">

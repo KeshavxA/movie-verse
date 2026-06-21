@@ -4,6 +4,7 @@ import { ArrowLeft, Star, Clock, Calendar, Heart, MessageSquare, Share2, Check, 
 import { useWatchlist } from "../context/WatchlistContext";
 import SeasonChart from "../components/SeasonChart";
 import WatchProviders from "../components/WatchProviders";
+import { useLanguage } from "../context/LanguageContext";
 
 const TvDetails = () => {
   const { id } = useParams();
@@ -11,6 +12,7 @@ const TvDetails = () => {
   const [show, setShow] = useState(null);
   const [copied, setCopied] = useState(false);
   const { isInAnyPlaylist, toggleWatchlist } = useWatchlist();
+  const { lang, t } = useLanguage();
   const API_KEY = "4fdd0d59a1f17e38b912e065674f80d8"; 
 
   const handleShare = async () => {
@@ -25,11 +27,11 @@ const TvDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0); 
-    fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar,reviews,watch/providers`)
+    fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&append_to_response=videos,credits,similar,reviews,watch/providers&language=${lang}`)
       .then((res) => res.json())
       .then((data) => setShow(data))
       .catch((err) => console.error(err));
-  }, [id]);
+  }, [id, lang]);
 
   if (!show) return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
@@ -117,9 +119,9 @@ const TvDetails = () => {
               <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">{show.overview}</p>
             </div>
 
-            {show.credits?.cast && show.credits.cast.length > 0 && (
-              <div className="mb-10">
-                <h2 className="text-xl font-bold mb-6 border-l-4 border-blue-500 pl-3 uppercase tracking-widest text-sm">Top Cast</h2>
+            {show.credits?.cast?.length > 0 && (
+              <div className="mt-10">
+                <h2 className="text-xl font-bold mb-6 border-l-4 border-red-500 pl-3 uppercase tracking-widest text-sm">{t('cast')}</h2>
                 <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
                   {show.credits.cast.slice(0, 10).map((actor) => (
                     <Link to={`/actor/${actor.id}`} key={actor.id} className="flex-shrink-0 w-32 group block">
@@ -176,7 +178,7 @@ const TvDetails = () => {
 
             {trailer && (
               <div className="mt-10">
-                <h2 className="text-xl font-bold mb-6 border-l-4 border-red-500 pl-3 uppercase tracking-widest text-sm">Official Trailer</h2>
+                <h2 className="text-xl font-bold mb-6 border-l-4 border-red-500 pl-3 uppercase tracking-widest text-sm">{t('officialTrailer')}</h2>
                 <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl">
                   <iframe
                     className="absolute top-0 left-0 w-full h-full"
@@ -190,9 +192,9 @@ const TvDetails = () => {
               </div>
             )}
 
-            {show.similar?.results && show.similar.results.length > 0 && (
-              <div className="mt-16 mb-10">
-                <h2 className="text-2xl font-bold mb-6 border-l-4 border-yellow-500 pl-3 uppercase tracking-widest text-sm text-slate-900 dark:text-white">You May Also Like</h2>
+            {show.similar?.results?.length > 0 && (
+              <div className="mt-16">
+                <h2 className="text-xl font-bold mb-6 border-l-4 border-red-500 pl-3 uppercase tracking-widest text-sm">{t('similar')}</h2>
                 <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
                   {show.similar.results.slice(0, 15).map((similarShow) => (
                     <Link to={`/tv/${similarShow.id}`} key={similarShow.id} className="flex-shrink-0 w-40 group block">
@@ -215,9 +217,9 @@ const TvDetails = () => {
               </div>
             )}
 
-            {show.reviews?.results && show.reviews.results.length > 0 && (
-              <div className="mt-16 mb-10">
-                <h2 className="text-2xl font-bold mb-6 border-l-4 border-green-500 pl-3 uppercase tracking-widest text-sm text-slate-900 dark:text-white">User Reviews</h2>
+            {show.reviews?.results?.length > 0 && (
+              <div className="mt-16">
+                <h2 className="text-xl font-bold mb-6 border-l-4 border-red-500 pl-3 uppercase tracking-widest text-sm flex items-center gap-2"><MessageSquare size={20} /> {t('reviews')}</h2>
                 <div className="space-y-6">
                   {show.reviews.results.slice(0, 5).map((review) => (
                     <div key={review.id} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md">

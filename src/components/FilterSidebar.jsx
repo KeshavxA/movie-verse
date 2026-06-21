@@ -1,4 +1,5 @@
 import { X, FilterX } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 const genresList = [
   { id: 28, name: "Action" },
@@ -48,6 +49,7 @@ const FilterSidebar = ({
   setSelectedProviders,
   setPage
 }) => {
+  const { t } = useLanguage();
   const toggleGenre = (id) => {
     setSelectedGenres(prev => 
       prev.includes(id) ? prev.filter(g => g !== id) : [...prev, id]
@@ -98,7 +100,7 @@ const FilterSidebar = ({
       >
         <div className="p-6">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white">Filters & Sort</h2>
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white">{t('filtersSort')}</h2>
             <div className="flex items-center gap-2">
               {hasActiveFilters && (
                 <button 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Plus, Check } from 'lucide-react';
 import { useWatchlist } from '../context/WatchlistContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const AddToPlaylistModal = () => {
   const { 
@@ -12,6 +13,7 @@ const AddToPlaylistModal = () => {
     removeFromPlaylist, 
     isInPlaylist 
   } = useWatchlist();
+  const { t } = useLanguage();
 
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -45,7 +47,7 @@ const AddToPlaylistModal = () => {
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl z-50 overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[85vh]">
         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
           <h3 className="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
-            Save to Collection
+            {t('saveToCollection')}
           </h3>
           <button 
             onClick={closeModal}
@@ -103,7 +105,7 @@ const AddToPlaylistModal = () => {
                 disabled={!newPlaylistName.trim()}
                 className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors"
               >
-                Create
+                {t('create')}
               </button>
             </form>
           ) : (
@@ -111,7 +113,7 @@ const AddToPlaylistModal = () => {
               onClick={() => setIsCreating(true)}
               className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium text-sm"
             >
-              <Plus size={18} /> New Collection
+              <Plus size={18} /> {t('newCollection')}
             </button>
           )}
         </div>
