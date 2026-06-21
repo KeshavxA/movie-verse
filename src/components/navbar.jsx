@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, Film, X, Heart, Sun, Moon, History, Trash2 } from "lucide-react";
+import { Search, Film, X, Heart, Sun, Moon, History, Trash2, Mic, MicOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useWatchlist } from "../context/WatchlistContext";
 import { useTheme } from "../context/ThemeContext";
@@ -13,6 +13,49 @@ const Navbar = ({ searchTerm, setSearchTerm, mediaType, setMediaType }) => {
   
   const [searchHistory, setSearchHistory] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+  if (recognition) {
+    recognition.continuous = false;
+    recognition.lang = lang; // Use selected language for speech recognition
+    recognition.interimResults = false;
+  }
+
+  const toggleVoiceSearch = () => {
+    if (!recognition) {
+      alert("Your browser does not support Voice Search.");
+      return;
+    }
+
+    if (isListening) {
+      recognition.stop();
+      setIsListening(false);
+    } else {
+      recognition.start();
+      setIsListening(true);
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setSearchTerm(transcript);
+        if(window.location.pathname !== "/") {
+          navigate("/");
+        }
+        setIsListening(false);
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error", event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+    }
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem("movieverse_search_history");
@@ -81,14 +124,26 @@ const Navbar = ({ searchTerm, setSearchTerm, mediaType, setMediaType }) => {
           size={20} 
         />
 
-        {searchTerm && (
-          <button 
-            onClick={() => setSearchTerm("")}
-            className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
-          >
-            <X size={20} />
-          </button>
-        )}
+        <div className="absolute right-3 top-2.5 flex items-center gap-2">
+          {searchTerm && (
+            <button 
+              onClick={() => setSearchTerm("")}
+              className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              <X size={20} />
+            </button>
+          )}
+          
+          {SpeechRecognition && (
+            <button
+              onClick={toggleVoiceSearch}
+              className={`transition-colors ${isListening ? 'text-red-500 animate-pulse' : 'text-slate-500 hover:text-blue-500'}`}
+              title="Voice Search"
+            >
+              {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+            </button>
+          )}
+        </div>
 
         {isFocused && searchHistory.length > 0 && (
           <div className="absolute top-full left-0 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50">
