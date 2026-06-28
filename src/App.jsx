@@ -11,6 +11,7 @@ import { useWatchlist } from "./context/WatchlistContext";
 import ActorDetails from "./pages/ActorDetails";
 import ScrollToTop from "./components/ScrollToTop";
 import AddToPlaylistModal from "./components/AddToPlaylistModal";
+import AIMatchmaker from "./components/AIMatchmaker";
 import { useLanguage } from "./context/LanguageContext";
 
 
@@ -277,6 +278,7 @@ function App() {
       </Routes>
       <ScrollToTop />
       <AddToPlaylistModal />
+      <AIMatchmaker />
     </>
   );
 }
