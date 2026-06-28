@@ -3,8 +3,8 @@ import { Routes, Route, Link } from "react-router-dom";
 import { Heart, Filter } from "lucide-react";
 import Navbar from "./components/Navbar";
 import FilterSidebar from "./components/FilterSidebar";
-import { useMovies } from "./hooks/useMovies"; 
-import MovieDetails from "./pages/MovieDetails"; 
+import { useMovies } from "./hooks/useMovies";
+import MovieDetails from "./pages/MovieDetails";
 import TvDetails from "./pages/TvDetails";
 import Watchlist from "./pages/Watchlist";
 import { useWatchlist } from "./context/WatchlistContext";
@@ -83,7 +83,7 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white font-sans selection:bg-blue-500 selection:text-white transition-colors duration-300">
       <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      
+
       <main className="max-w-7xl mx-auto p-6 md:p-10">
         <header className="mb-8">
           <h2 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-slate-700 to-slate-500 dark:from-white dark:via-slate-300 dark:to-slate-500 bg-clip-text text-transparent">
@@ -104,9 +104,9 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
                   <Link to={`/${mediaType}/${item.id}`} key={item.id} className="flex-shrink-0 w-48 group block">
                     <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800 group-hover:border-red-500/50 transition-all duration-300 group-hover:-translate-y-2 relative">
                       <div className="relative aspect-[2/3] overflow-hidden">
-                        <img 
-                          src={item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Poster"} 
-                          alt={item.title || item.name} 
+                        <img
+                          src={item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Poster"}
+                          alt={item.title || item.name}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/70 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-yellow-600 dark:text-yellow-400 border border-slate-200 dark:border-white/10 shadow-sm">
@@ -149,10 +149,10 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
                 <Link to={`/${mediaType}/${item.id}`}>
                   <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-blue-500/20 transition-all duration-500 hover:-translate-y-2 border border-slate-200 dark:border-slate-800 group-hover:border-blue-500/50">
                     <div className="relative aspect-[2/3] overflow-hidden">
-                      <img 
-                        src={item.poster_path 
-                          ? `https://image.tmdb.org/t/p/w500${item.poster_path}` 
-                          : "https://via.placeholder.com/500x750?text=No+Poster"} 
+                      <img
+                        src={item.poster_path
+                          ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                          : "https://via.placeholder.com/500x750?text=No+Poster"}
                         alt={item.title || item.name}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         loading="lazy"
@@ -161,7 +161,7 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
                         ⭐ {movie.vote_average?.toFixed(1)}
                       </div>
                     </div>
-                    
+
                     <div className="p-4">
                       <h3 className="font-bold text-sm md:text-base truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {item.title || item.name}
@@ -185,9 +185,9 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
                   }}
                   className="absolute top-3 left-3 z-10 p-2 bg-white/90 hover:bg-white dark:bg-black/50 dark:hover:bg-black/80 backdrop-blur-md rounded-full transition-all border border-slate-200 dark:border-white/10 opacity-0 group-hover:opacity-100 shadow-sm"
                 >
-                  <Heart 
-                    size={18} 
-                    className={isInAnyPlaylist(item.id) ? "fill-red-500 text-red-500" : "text-slate-400 dark:text-white"} 
+                  <Heart
+                    size={18}
+                    className={isInAnyPlaylist(item.id) ? "fill-red-500 text-red-500" : "text-slate-400 dark:text-white"}
                   />
                 </button>
               </div>
@@ -196,9 +196,9 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
             <div className="col-span-full text-center py-20 bg-white/50 dark:bg-slate-900/50 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800">
               <div className="text-6xl mb-4">🎬</div>
               <h3 className="text-xl text-slate-600 dark:text-slate-400 font-medium">{t('noMoviesFound')}</h3>
-              <button 
+              <button
                 onClick={() => {
-                  setSearchTerm(""); 
+                  setSearchTerm("");
                   setSelectedGenres([]);
                   setSortBy("popularity.desc");
                   setMinYear("");
@@ -217,7 +217,7 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
             </div>
           )}
         </div>
-        
+
         {movies.length > 0 && hasMore && (
           <div className="mt-12 flex justify-center">
             <button
@@ -237,7 +237,7 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
           © 2026 MovieVerse • Designed by Keshav Sharma
         </p>
       </footer>
-      <FilterSidebar 
+      <FilterSidebar
         isOpen={isFilterSidebarOpen}
         onClose={() => setIsFilterSidebarOpen(false)}
         sortBy={sortBy}
