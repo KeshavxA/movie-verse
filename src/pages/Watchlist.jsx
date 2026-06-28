@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, Folder, Trash2, List } from "lucide-react";
+import { Heart, Folder, Trash2, List, Share2, Check } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { useWatchlist } from "../context/WatchlistContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -8,6 +8,7 @@ import { useLanguage } from "../context/LanguageContext";
 const Watchlist = ({ searchTerm, setSearchTerm }) => {
   const { playlists, toggleWatchlist, isInAnyPlaylist, deletePlaylist } = useWatchlist();
   const [activePlaylistId, setActivePlaylistId] = useState('default');
+  const [copiedShare, setCopiedShare] = useState(false);
   const { t } = useLanguage();
 
   const activePlaylist = playlists.find(p => p.id === activePlaylistId) || playlists[0];
@@ -18,6 +19,25 @@ const Watchlist = ({ searchTerm, setSearchTerm }) => {
       if (activePlaylistId === id) {
         setActivePlaylistId('default');
       }
+    }
+  };
+
+  const handleShareCollection = async () => {
+    if (!activePlaylist || activePlaylist.items.length === 0) return;
+    const itemsParam = activePlaylist.items
+      .map(item => `${item.media_type === 'tv' ? 't' : 'm'}:${item.id}`)
+      .join(',');
+    
+    const url = new URL(window.location.origin + '/shared');
+    url.searchParams.set('name', activePlaylist.name);
+    url.searchParams.set('items', itemsParam);
+    
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      setCopiedShare(true);
+      setTimeout(() => setCopiedShare(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy link", err);
     }
   };
 
@@ -69,9 +89,23 @@ const Watchlist = ({ searchTerm, setSearchTerm }) => {
         {/* Main Content Area */}
         <div className="flex-1">
           <header className="mb-8">
-            <h2 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-slate-700 to-slate-500 dark:from-white dark:via-slate-300 dark:to-slate-500 bg-clip-text text-transparent flex items-center gap-4">
-              {activePlaylist?.name}
-            </h2>
+            <div className="flex items-center gap-4">
+              <h2 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-slate-700 to-slate-500 dark:from-white dark:via-slate-300 dark:to-slate-500 bg-clip-text text-transparent flex items-center gap-4">
+                {activePlaylist?.name}
+              </h2>
+              {activePlaylist?.items.length > 0 && (
+                <button 
+                  onClick={handleShareCollection}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-full font-bold text-sm hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                >
+                  {copiedShare ? (
+                    <><Check size={16} className="text-green-500" /> Copied Link</>
+                  ) : (
+                    <><Share2 size={16} /> Share Collection</>
+                  )}
+                </button>
+              )}
+            </div>
             <p className="text-slate-600 dark:text-slate-400 mt-4 text-lg">
               {activePlaylist?.items.length} {activePlaylist?.items.length === 1 ? "item" : "items"} saved
             </p>

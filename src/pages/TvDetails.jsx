@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Star, Clock, Calendar, Heart, MessageSquare, Share2, Check, Tv } from "lucide-react";
+import { ArrowLeft, Star, Clock, Calendar, Heart, MessageSquare, Share2, Check, Tv, Twitter, MessageCircle } from "lucide-react";
 import { useWatchlist } from "../context/WatchlistContext";
 import SeasonChart from "../components/SeasonChart";
 import WatchProviders from "../components/WatchProviders";
@@ -24,6 +24,18 @@ const TvDetails = () => {
     } catch (err) {
       console.error("Failed to copy link", err);
     }
+  };
+
+  const handleTwitterShare = () => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`Check out ${show?.name} on MovieVerse!`);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+  };
+
+  const handleWhatsappShare = () => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`Check out ${show?.name} on MovieVerse! ${url}`);
+    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
   useEffect(() => {
@@ -76,9 +88,23 @@ const TvDetails = () => {
               <h1 className="text-4xl md:text-6xl font-black leading-tight">{show.name}</h1>
               <div className="flex items-center gap-3 ml-4 flex-shrink-0">
                 <button
+                  onClick={handleTwitterShare}
+                  className="p-3 bg-white dark:bg-slate-900 hover:bg-[#1DA1F2]/10 dark:hover:bg-[#1DA1F2]/20 rounded-full transition-all border border-slate-200 dark:border-slate-700 shadow-sm group"
+                  title="Share to Twitter"
+                >
+                  <Twitter size={28} className="text-slate-400 group-hover:text-[#1DA1F2] transition-colors" />
+                </button>
+                <button
+                  onClick={handleWhatsappShare}
+                  className="p-3 bg-white dark:bg-slate-900 hover:bg-[#25D366]/10 dark:hover:bg-[#25D366]/20 rounded-full transition-all border border-slate-200 dark:border-slate-700 shadow-sm group"
+                  title="Share to WhatsApp"
+                >
+                  <MessageCircle size={28} className="text-slate-400 group-hover:text-[#25D366] transition-colors" />
+                </button>
+                <button
                   onClick={handleShare}
                   className="p-3 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
-                  title="Share TV Show"
+                  title="Copy Link"
                 >
                   {copied ? (
                     <Check size={28} className="text-green-500" />
