@@ -13,6 +13,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import AddToPlaylistModal from "./components/AddToPlaylistModal";
 import AIMatchmaker from "./components/AIMatchmaker";
 import { useLanguage } from "./context/LanguageContext";
+import ReleaseCalendar from "./pages/ReleaseCalendar";
 
 
 const MovieSkeleton = () => (
@@ -275,6 +276,7 @@ function App() {
         <Route path="/tv/:id" element={<TvDetails />} />
         <Route path="/actor/:id" element={<ActorDetails />} />
         <Route path="/watchlist" element={<Watchlist searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
+        <Route path="/calendar" element={<ReleaseCalendar />} />
       </Routes>
       <ScrollToTop />
       <AddToPlaylistModal />
