@@ -29,7 +29,10 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState("popularity.desc");
-  const [decade, setDecade] = useState("");
+  const [minYear, setMinYear] = useState("");
+  const [maxYear, setMaxYear] = useState("");
+  const [minRating, setMinRating] = useState(0);
+  const [minVotes, setMinVotes] = useState(0);
   const [language, setLanguage] = useState("");
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [maxRuntime, setMaxRuntime] = useState(null);
@@ -61,7 +64,10 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
     selectedGenres,
     page,
     sortBy,
-    decade,
+    minYear,
+    maxYear,
+    minRating,
+    minVotes,
     language,
     maxRuntime,
     selectedProviders,
@@ -69,7 +75,6 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
   );
 
   const handleSortChange = (e) => { setSortBy(e.target.value); setPage(1); };
-  const handleDecadeChange = (e) => { setDecade(e.target.value); setPage(1); };
   const handleLanguageChange = (e) => { setLanguage(e.target.value); setPage(1); };
 
   return (
@@ -123,7 +128,7 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
               >
                 <Filter size={20} />
                 {t('filtersAndSort')}
-                {(selectedGenres.length > 0 || sortBy !== "popularity.desc" || decade || language || maxRuntime || selectedProviders.length > 0) && (
+                {(selectedGenres.length > 0 || sortBy !== "popularity.desc" || minYear || maxYear || minRating > 0 || minVotes > 0 || language || maxRuntime || selectedProviders.length > 0) && (
                   <span className="flex items-center justify-center bg-blue-600 text-white text-xs rounded-full h-5 w-5 ml-1">
                     !
                   </span>
@@ -193,7 +198,10 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
                   setSearchTerm(""); 
                   setSelectedGenres([]);
                   setSortBy("popularity.desc");
-                  setDecade("");
+                  setMinYear("");
+                  setMaxYear("");
+                  setMinRating(0);
+                  setMinVotes(0);
                   setLanguage("");
                   setMaxRuntime(null);
                   setSelectedProviders([]);
@@ -226,6 +234,29 @@ const HomePage = ({ searchTerm, setSearchTerm, mediaType }) => {
           © 2026 MovieVerse • Designed by Keshav Sharma
         </p>
       </footer>
+      <FilterSidebar 
+        isOpen={isFilterSidebarOpen}
+        onClose={() => setIsFilterSidebarOpen(false)}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        minYear={minYear}
+        setMinYear={setMinYear}
+        maxYear={maxYear}
+        setMaxYear={setMaxYear}
+        minRating={minRating}
+        setMinRating={setMinRating}
+        minVotes={minVotes}
+        setMinVotes={setMinVotes}
+        language={language}
+        setLanguage={setLanguage}
+        selectedGenres={selectedGenres}
+        setSelectedGenres={setSelectedGenres}
+        maxRuntime={maxRuntime}
+        setMaxRuntime={setMaxRuntime}
+        selectedProviders={selectedProviders}
+        setSelectedProviders={setSelectedProviders}
+        setPage={setPage}
+      />
     </div>
   );
 };

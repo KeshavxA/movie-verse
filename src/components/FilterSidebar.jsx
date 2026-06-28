@@ -37,8 +37,14 @@ const FilterSidebar = ({
   onClose,
   sortBy,
   setSortBy,
-  decade,
-  setDecade,
+  minYear,
+  setMinYear,
+  maxYear,
+  setMaxYear,
+  minRating,
+  setMinRating,
+  minVotes,
+  setMinVotes,
   language,
   setLanguage,
   selectedGenres,
@@ -66,7 +72,10 @@ const FilterSidebar = ({
 
   const clearFilters = () => {
     setSortBy("popularity.desc");
-    setDecade("");
+    setMinYear("");
+    setMaxYear("");
+    setMinRating(0);
+    setMinVotes(0);
     setLanguage("");
     setSelectedGenres([]);
     setMaxRuntime(null);
@@ -76,7 +85,10 @@ const FilterSidebar = ({
 
   const hasActiveFilters = 
     sortBy !== "popularity.desc" || 
-    decade !== "" || 
+    minYear !== "" || 
+    maxYear !== "" || 
+    minRating > 0 ||
+    minVotes > 0 ||
     language !== "" || 
     selectedGenres.length > 0 || 
     maxRuntime !== null || 
@@ -224,20 +236,58 @@ const FilterSidebar = ({
               </div>
             </div>
 
-            {/* Decade */}
+            {/* Release Year Range */}
             <div>
-              <h3 className="font-bold text-slate-800 dark:text-slate-200 mb-3 uppercase tracking-wider text-xs">Release Decade</h3>
+              <h3 className="font-bold text-slate-800 dark:text-slate-200 mb-3 uppercase tracking-wider text-xs">Release Year</h3>
+              <div className="flex items-center gap-2">
+                <input 
+                  type="number" 
+                  placeholder="From (e.g. 2010)"
+                  value={minYear}
+                  onChange={(e) => { setMinYear(e.target.value); setPage(1); }}
+                  className="w-full bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+                <span className="text-slate-500 font-bold">-</span>
+                <input 
+                  type="number" 
+                  placeholder="To (e.g. 2024)"
+                  value={maxYear}
+                  onChange={(e) => { setMaxYear(e.target.value); setPage(1); }}
+                  className="w-full bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Minimum Rating */}
+            <div>
+              <div className="flex justify-between items-end mb-3">
+                <h3 className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-xs">Minimum Rating</h3>
+                <span className="text-sm font-bold text-blue-600 dark:text-blue-400">{minRating > 0 ? `${minRating}+ Stars` : 'Any'}</span>
+              </div>
+              <input 
+                type="range" 
+                min="0" 
+                max="10" 
+                step="0.5"
+                value={minRating}
+                onChange={(e) => { setMinRating(parseFloat(e.target.value)); setPage(1); }}
+                className="w-full accent-blue-600 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-800"
+              />
+            </div>
+
+            {/* Minimum Votes */}
+            <div>
+              <h3 className="font-bold text-slate-800 dark:text-slate-200 mb-3 uppercase tracking-wider text-xs">Minimum Votes</h3>
               <select 
-                value={decade} 
-                onChange={(e) => { setDecade(e.target.value); setPage(1); }}
+                value={minVotes} 
+                onChange={(e) => { setMinVotes(parseInt(e.target.value)); setPage(1); }}
                 className="w-full bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer appearance-none"
               >
-                <option value="">Any Decade</option>
-                <option value="2020">2020s</option>
-                <option value="2010">2010s</option>
-                <option value="2000">2000s</option>
-                <option value="1990">1990s</option>
-                <option value="1980">1980s</option>
+                <option value="0">Any Amount</option>
+                <option value="100">100+ Votes</option>
+                <option value="500">500+ Votes</option>
+                <option value="1000">1000+ Votes</option>
+                <option value="5000">5000+ Votes</option>
               </select>
             </div>
 

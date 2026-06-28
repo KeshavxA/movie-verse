@@ -9,7 +9,7 @@ const BASE_URL = "https://api.themoviedb.org/3";
   @param {number[]} genreIds 
  */
  
-export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popularity.desc", decade = "", language = "", maxRuntime = null, providers = [], mediaType = "movie") => {
+export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popularity.desc", minYear = "", maxYear = "", minRating = 0, minVotes = 0, language = "", maxRuntime = null, providers = [], mediaType = "movie") => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -31,17 +31,25 @@ export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popular
       if (query) {
         endpoint = `${BASE_URL}/search/${mediaType}?api_key=${API_KEY}&query=${encodeURIComponent(query)}&page=${page}&language=${lang}`;
       } else {
-        const isDefault = genreIds.length === 0 && sortBy === "popularity.desc" && !decade && !language && !maxRuntime && providers.length === 0;
+        const isDefault = genreIds.length === 0 && sortBy === "popularity.desc" && !minYear && !maxYear && minRating === 0 && minVotes === 0 && !language && !maxRuntime && providers.length === 0;
         if (isDefault) {
           endpoint = `${BASE_URL}/trending/${mediaType}/day?api_key=${API_KEY}&page=${page}&language=${lang}`;
         } else {
           endpoint = `${BASE_URL}/discover/${mediaType}?api_key=${API_KEY}&page=${page}&sort_by=${sortBy}&language=${lang}`;
           if (genreIds.length > 0) endpoint += `&with_genres=${genreIds.join(',')}`;
           if (language) endpoint += `&with_original_language=${language}`;
-          if (decade) {
-            const startYear = parseInt(decade);
-            const dateField = mediaType === "movie" ? "primary_release_date" : "first_air_date";
-            endpoint += `&${dateField}.gte=${startYear}-01-01&${dateField}.lte=${startYear + 9}-12-31`;
+          const dateField = mediaType === "movie" ? "primary_release_date" : "first_air_date";
+          if (minYear) {
+            endpoint += `&${dateField}.gte=${minYear}-01-01`;
+          }
+          if (maxYear) {
+            endpoint += `&${dateField}.lte=${maxYear}-12-31`;
+          }
+          if (minRating > 0) {
+            endpoint += `&vote_average.gte=${minRating}`;
+          }
+          if (minVotes > 0) {
+            endpoint += `&vote_count.gte=${minVotes}`;
           }
           if (maxRuntime) {
             endpoint += `&with_runtime.lte=${maxRuntime}`;
@@ -84,7 +92,7 @@ export const useMovies = (query = "", genreIds = [], page = 1, sortBy = "popular
     };
 
     fetchMovies();
-  }, [query, genreIds.join(','), page, sortBy, decade, language, maxRuntime, providers.join(','), mediaType, lang]); 
+  }, [query, genreIds.join(','), page, sortBy, minYear, maxYear, minRating, minVotes, language, maxRuntime, providers.join(','), mediaType, lang]); 
 
   return { movies, loading, loadingMore, hasMore, error };
 };
