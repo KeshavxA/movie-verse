@@ -7,6 +7,7 @@ import WatchProviders from "../components/WatchProviders";
 import ImageGallery from "../components/ImageGallery";
 import { useLanguage } from "../context/LanguageContext";
 import CommunityReviews from "../components/CommunityReviews";
+import VideoGallery from "../components/VideoGallery";
 import { useCommunityReviews } from "../hooks/useCommunityReviews";
 
 const TvDetails = () => {
@@ -58,6 +59,8 @@ const TvDetails = () => {
   const trailer = show.videos?.results?.find(
     (vid) => vid.type === "Trailer" && vid.site === "YouTube"
   );
+  
+  const youtubeVideos = show.videos?.results?.filter(vid => vid.site === "YouTube") || [];
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white pb-20 transition-colors duration-300">
@@ -225,21 +228,7 @@ const TvDetails = () => {
               </div>
             )}
 
-            {trailer && (
-              <div className="mt-10">
-                <h2 className="text-xl font-bold mb-6 border-l-4 border-red-500 pl-3 uppercase tracking-widest text-sm">{t('officialTrailer')}</h2>
-                <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl">
-                  <iframe
-                    className="absolute top-0 left-0 w-full h-full"
-                    src={`https://www.youtube.com/embed/${trailer.key}?autoplay=0`}
-                    title={`${show.name} Trailer`}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
-                </div>
-              </div>
-            )}
+            <VideoGallery videos={youtubeVideos} />
 
             {show.images && (
               <ImageGallery images={show.images} />
