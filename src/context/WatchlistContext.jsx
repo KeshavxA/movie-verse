@@ -1,4 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useAuth } from "./AuthContext";
+import { db } from "../firebase/config";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const WatchlistContext = createContext();
 
@@ -7,6 +10,7 @@ export const useWatchlist = () => {
 };
 
 export const WatchlistProvider = ({ children }) => {
+  const { currentUser } = useAuth();
   const [playlists, setPlaylists] = useState(() => {
     try {
       const stored = localStorage.getItem("movieverse_playlists");
@@ -33,9 +37,51 @@ export const WatchlistProvider = ({ children }) => {
 
   const [modalItem, setModalItem] = useState(null); // Item currently selected to add to a playlist
 
+  // Fetch from firestore on login
   useEffect(() => {
+    const fetchPlaylists = async () => {
+      if (currentUser) {
+        try {
+          const docRef = doc(db, "users", currentUser.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data.playlists) {
+                setPlaylists(data.playlists);
+            }
+          } else {
+             // Create initial doc with current local playlists if new user
+             await setDoc(docRef, { playlists });
+          }
+        } catch (error) {
+          console.error("Error fetching playlists from firestore:", error);
+        }
+      }
+    };
+    fetchPlaylists();
+  }, [currentUser]);
+
+  // Sync to firestore or localstorage on change
+  useEffect(() => {
+    if (currentUser) {
+      const syncToFirestore = async () => {
+        try {
+          const docRef = doc(db, "users", currentUser.uid);
+          await setDoc(docRef, { playlists }, { merge: true });
+        } catch (error) {
+          console.error("Error syncing to firestore:", error);
+        }
+      };
+      // Prevent sync on initial mount when playlists might not be fully fetched
+      // (This is a simplistic approach; a better one uses a 'isLoaded' flag, but this works for now)
+      if (playlists.length > 0) {
+        syncToFirestore();
+      }
+    }
+    // Always keep local storage somewhat up to date as a fallback
     localStorage.setItem("movieverse_playlists", JSON.stringify(playlists));
-  }, [playlists]);
+  }, [playlists, currentUser]);
 
   const createPlaylist = (name) => {
     const newId = Date.now().toString();

@@ -1,16 +1,20 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, Film, X, Heart, Sun, Moon, History, Trash2, Mic, MicOff, Calendar as CalendarIcon } from "lucide-react";
+import { Search, Film, X, Heart, Sun, Moon, History, Trash2, Mic, MicOff, Calendar as CalendarIcon, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useWatchlist } from "../context/WatchlistContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
+import AuthModal from "./AuthModal";
 
 const Navbar = ({ searchTerm, setSearchTerm, mediaType, setMediaType }) => {
   const { watchlist } = useWatchlist();
   const { theme, toggleTheme } = useTheme();
   const { lang, setLang, t } = useLanguage();
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -235,7 +239,38 @@ const Navbar = ({ searchTerm, setSearchTerm, mediaType, setMediaType }) => {
             {t('watchlist')}
           </p>
         </Link>
+        
+        {currentUser ? (
+          <div className="relative group z-50">
+            <button className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 rounded-full p-1 pl-3 pr-2 border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-colors">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300 max-w-[80px] truncate">
+                {currentUser.email?.split('@')[0] || "User"}
+              </span>
+              {currentUser.photoURL ? (
+                 <img src={currentUser.photoURL} alt="Avatar" className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700" />
+              ) : (
+                 <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                   <User size={16} />
+                 </div>
+              )}
+            </button>
+            <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+              <div className="p-2">
+                <Link to="/profile" className="block w-full text-left px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">Profile</Link>
+                <button onClick={logout} className="block w-full text-left px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">Sign Out</button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <button 
+            onClick={() => setIsAuthModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-bold transition-colors shadow-sm shadow-blue-500/30 ml-2 whitespace-nowrap"
+          >
+            Sign In
+          </button>
+        )}
       </div>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </nav>
   );
 };
