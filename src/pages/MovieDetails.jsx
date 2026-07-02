@@ -6,6 +6,8 @@ import FinancialChart from "../components/FinancialChart";
 import WatchProviders from "../components/WatchProviders";
 import ImageGallery from "../components/ImageGallery";
 import { useLanguage } from "../context/LanguageContext";
+import CommunityReviews from "../components/CommunityReviews";
+import { useCommunityReviews } from "../hooks/useCommunityReviews";
 
 const MovieDetails = () => {
   const { id } = useParams();
@@ -14,6 +16,7 @@ const MovieDetails = () => {
   const [copied, setCopied] = useState(false);
   const { isInAnyPlaylist, toggleWatchlist } = useWatchlist();
   const { lang, t } = useLanguage();
+  const { averageRating } = useCommunityReviews(id, 'movie');
   const API_KEY = "4fdd0d59a1f17e38b912e065674f80d8"; 
 
   const handleShare = async () => {
@@ -127,17 +130,35 @@ const MovieDetails = () => {
             <p className="text-blue-600 dark:text-blue-400 text-lg font-medium mb-6">{movie.tagline || "No tagline available"}</p>
             
             <div className="flex flex-wrap gap-4 mb-8">
-              <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                <Star className="text-yellow-500" size={18} fill="currentColor" />
-                <span className="font-bold">{movie.vote_average?.toFixed(1)}</span>
+              <div className="flex flex-col">
+                <span className="text-xs text-slate-500 uppercase tracking-widest font-bold mb-1 ml-1">TMDb</span>
+                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm h-10">
+                  <Star className="text-yellow-500" size={18} fill="currentColor" />
+                  <span className="font-bold">{movie.vote_average?.toFixed(1)}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 shadow-sm">
-                <Clock size={18} />
-                <span>{movie.runtime} min</span>
+              
+              <div className="flex flex-col">
+                <span className="text-xs text-slate-500 uppercase tracking-widest font-bold mb-1 ml-1">Community</span>
+                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm h-10">
+                  <Star className="text-blue-500" size={18} fill="currentColor" />
+                  <span className="font-bold text-blue-600 dark:text-blue-400">
+                    {averageRating > 0 ? averageRating.toFixed(1) : "New"}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 shadow-sm">
-                <Calendar size={18} />
-                <span>{movie.release_date}</span>
+              
+              <div className="flex flex-col justify-end">
+                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 shadow-sm h-10">
+                  <Clock size={18} />
+                  <span>{movie.runtime} min</span>
+                </div>
+              </div>
+              <div className="flex flex-col justify-end">
+                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 shadow-sm h-10">
+                  <Calendar size={18} />
+                  <span>{movie.release_date}</span>
+                </div>
               </div>
             </div>
 
@@ -225,6 +246,8 @@ const MovieDetails = () => {
                 </div>
               </div>
             )}
+            
+            <CommunityReviews mediaId={id} mediaType="movie" />
 
             {movie.reviews?.results?.length > 0 && (
               <div className="mt-16">
