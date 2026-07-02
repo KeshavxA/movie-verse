@@ -1,17 +1,45 @@
 import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 import { User, Mail, Calendar, Settings, Film } from "lucide-react";
+import { useWatchlist } from "../context/WatchlistContext";
+import UserAnalytics from "../components/UserAnalytics";
 
 const Profile = () => {
   const { currentUser } = useAuth();
+  const { playlists } = useWatchlist();
 
   if (!currentUser) {
     return <Navigate to="/" />;
   }
 
+  // Aggregate stats
+  let movieCount = 0;
+  let tvCount = 0;
+  let totalMinutes = 0;
+  const uniqueItems = new Set();
+
+  playlists.forEach(playlist => {
+    playlist.items?.forEach(item => {
+      if (!uniqueItems.has(item.id)) {
+        uniqueItems.add(item.id);
+        
+        const type = item.media_type || 'movie';
+        if (type === 'movie') {
+          movieCount++;
+          totalMinutes += (item.runtime || 120);
+        } else if (type === 'tv') {
+          tvCount++;
+          totalMinutes += 450; // estimate 450 mins per TV show
+        }
+      }
+    });
+  });
+
+  const totalWatchHours = Math.round(totalMinutes / 60);
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white pt-10 pb-20 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl md:text-5xl font-black mb-10 bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
           Your Profile
         </h1>
@@ -60,21 +88,20 @@ const Profile = () => {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center text-center">
-            <div className="text-4xl font-black text-blue-500 mb-2">--</div>
-            <div className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Movies Watched</div>
+            <div className="text-4xl font-black text-blue-500 mb-2">{movieCount}</div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Movies Saved</div>
           </div>
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center text-center">
-            <div className="text-4xl font-black text-purple-500 mb-2">--</div>
-            <div className="text-sm font-semibold text-slate-500 uppercase tracking-widest">TV Shows Watched</div>
+            <div className="text-4xl font-black text-purple-500 mb-2">{tvCount}</div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-widest">TV Shows Saved</div>
           </div>
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center text-center">
-            <div className="text-4xl font-black text-green-500 mb-2">--</div>
-            <div className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Total Watch Hours</div>
+            <div className="text-4xl font-black text-green-500 mb-2">{totalWatchHours}</div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Est. Watch Hours</div>
           </div>
         </div>
-        <div className="mt-8 text-center text-slate-500 text-sm">
-          Detailed analytics dashboard coming soon...
-        </div>
+        
+        <UserAnalytics playlists={playlists} />
       </div>
     </div>
   );
