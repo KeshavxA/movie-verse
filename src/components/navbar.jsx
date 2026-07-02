@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, Film, X, Heart, Sun, Moon, History, Trash2, Mic, MicOff, Calendar as CalendarIcon, User } from "lucide-react";
+import { Search, Film, X, Heart, Sun, Moon, History, Trash2, Mic, MicOff, Calendar as CalendarIcon, User, Users } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useWatchlist } from "../context/WatchlistContext";
 import { useTheme } from "../context/ThemeContext";
@@ -220,6 +220,12 @@ const Navbar = ({ searchTerm, setSearchTerm, mediaType, setMediaType }) => {
         </button>
 
         <div className="hidden md:block h-8 w-[1px] bg-slate-300 dark:bg-slate-800 mx-2"></div>
+        <Link to="/network" className="flex items-center gap-2 group hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer mr-2">
+          <Users size={24} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500 transition-colors" />
+          <p className="hidden md:block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-widest group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            Network
+          </p>
+        </Link>
         <Link to="/calendar" className="flex items-center gap-2 group hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer mr-2">
           <CalendarIcon size={24} className="text-slate-500 dark:text-slate-400 group-hover:text-blue-500 transition-colors" />
           <p className="hidden md:block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-widest group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">

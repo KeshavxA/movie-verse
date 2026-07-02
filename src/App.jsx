@@ -16,6 +16,7 @@ import { useLanguage } from "./context/LanguageContext";
 import ReleaseCalendar from "./pages/ReleaseCalendar";
 import SharedPlaylist from "./pages/SharedPlaylist";
 import Profile from "./pages/Profile";
+import Network from "./pages/Network";
 
 const MovieSkeleton = () => (
   <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 relative shadow-sm">
@@ -280,6 +281,7 @@ function App() {
         <Route path="/shared" element={<SharedPlaylist searchTerm={searchTerm} setSearchTerm={setSearchTerm} />} />
         <Route path="/calendar" element={<ReleaseCalendar />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/network" element={<Network />} />
       </Routes>
       <ScrollToTop />
       <AddToPlaylistModal />

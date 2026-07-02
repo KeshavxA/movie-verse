@@ -16,9 +16,9 @@ export const WatchlistProvider = ({ children }) => {
       const stored = localStorage.getItem("movieverse_playlists");
       if (stored) {
         const parsed = JSON.parse(stored);
-        // Migration: If it's the old flat array format, convert to the new object format
+
         if (Array.isArray(parsed) && (parsed.length === 0 || parsed[0].id)) {
-          // Wait, an old item has an 'id'. Let's check if the first item has 'items'. If not, it's the old format.
+
           if (parsed.length > 0 && !parsed[0].items) {
             return [{ id: 'default', name: 'Watchlist', items: parsed }];
           }
@@ -44,15 +44,15 @@ export const WatchlistProvider = ({ children }) => {
         try {
           const docRef = doc(db, "users", currentUser.uid);
           const docSnap = await getDoc(docRef);
-          
+
           if (docSnap.exists()) {
             const data = docSnap.data();
             if (data.playlists) {
-                setPlaylists(data.playlists);
+              setPlaylists(data.playlists);
             }
           } else {
-             // Create initial doc with current local playlists if new user
-             await setDoc(docRef, { playlists });
+            // Create initial doc with current local playlists if new user
+            await setDoc(docRef, { playlists });
           }
         } catch (error) {
           console.error("Error fetching playlists from firestore:", error);

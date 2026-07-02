@@ -37,8 +37,23 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             setCurrentUser(user);
+            if (user) {
+                try {
+                    const { doc, setDoc } = await import("firebase/firestore");
+                    const { db } = await import("../firebase/config");
+                    const userRef = doc(db, "users", user.uid);
+                    await setDoc(userRef, {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName || user.email.split('@')[0],
+                        photoURL: user.photoURL || null
+                    }, { merge: true });
+                } catch (e) {
+                    console.error("Error syncing user profile:", e);
+                }
+            }
             setLoading(false);
         });
 
